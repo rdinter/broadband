@@ -46,7 +46,7 @@ for (i in files) {
   rm(inp)
 }
 
-apply(data, 2, function(x) sum(is.na(x)))
+# apply(data, 2, function(x) sum(is.na(x)))
 
 miss <- is.na(data$rfc_per_1000_hhs)
 data$rfc_per_1000_hhs[miss] <- data$rfhsc_per_1000_hhs[miss]
@@ -59,6 +59,8 @@ data$rfc_per_1000_hhs_btop[miss] <- data$rfc_per_1000_hhs_nbp[miss]
 data <- data[, -c(13, 14, 15)]
 
 write.csv(data, paste0(localDir, "/FCC08-13.csv"), row.names = F)
+
+rm(list = ls())
 
 print(paste0("Finished 0-broadband-data_county at ", Sys.time()))
 

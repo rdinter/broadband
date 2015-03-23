@@ -47,7 +47,7 @@ for (i in files) {
   data = rbind.fill(data, inp)
   rm(inp)
 }
-apply(data, 2, function(x) sum(is.na(x)))
+# apply(data, 2, function(x) sum(is.na(x)))
 
 miss <- is.na(data$rfc_per_1000_hhs)
 data$rfc_per_1000_hhs[miss] <- data$rfhsc_per_1000_hhs[miss]
@@ -60,6 +60,8 @@ data$rfc_per_1000_hhs_btop[miss] <- data$rfc_per_1000_hhs_nbp[miss]
 data <- data[, -c(15, 16, 17)]
 
 write.csv(data, paste0(localDir,"/FCC_tract_08-13.csv"), row.names = F)
+
+rm(list = ls())
 
 print(paste0("Finished 0-broadband-data_tract at ", Sys.time()))
 

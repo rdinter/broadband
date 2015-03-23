@@ -2,7 +2,10 @@
 .Rhistory
 .RData
 README.pdf
+<<<<<<< HEAD
 0-data-compile-output.txt
 broadband.Rproj
 RStudioSmall.png
 README.html
+=======
+>>>>>>> 14a80363db8babb140e6e3c0bc56332427f7c7d7

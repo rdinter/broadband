@@ -76,4 +76,4 @@ unemp$FIPS   <- as.numeric(substr(unemp$LAUS, 3, 7))
 unemp        <- dcast(unemp, FIPS + year ~ var, value.var = "value",
                      fun.aggregate = mean)
 
-write.csv(unemp, paste0(localDir, "/LAUnemp.csv"))
+write.csv(unemp, paste0(localDir, "/LAUnemp.csv"), row.names = F)

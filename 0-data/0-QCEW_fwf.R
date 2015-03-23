@@ -70,15 +70,15 @@ place     <- substr(data$fips, nchar(data$fips) - 2, nchar(data$fips)) == "999"
 data$FIPS[place] = data$FIPS[place] - 999
 
 
-write.csv(data, paste0(localDir, "/QCEW_.csv"))
+write.csv(data, paste0(localDir, "/QCEW_.csv"), row.names = F)
 save(data, file = paste0(localDir, "/QCEW_.RData"))
 
 #Annual Data
 annual <- data[, c("year", "FIPS", "NAICS", "ownership", "establishmentsA",
                    "employA", "wagesA", "taxwageA", "contrA",
                    "avgwageA", "avgpayA")]
-write.csv(annual, paste0(localDir, "/QCEWAnnual_.csv"))
-save(annual, file = paste0(localDir, "/QCEWAnnual_.RData"))
+write.csv(annual, paste0(localDir, "/QCEWAnnual_.csv"), row.names = F)
+save(annual, file = paste0(localDir, "/QCEWAnnual_.RData"), row.names = F)
 
 #Quarterly Data
 data1 <- data[,c("year", "FIPS", "NAICS", "ownership", "establishments1",
@@ -106,12 +106,14 @@ names(data3)  <- names
 names(data4)  <- names
 quarterly     <- rbind(data1, data2, data3, data4)
 rm(data1, data2, data3, data4)
-write.csv(quarterly, paste0(localDir, "/QCEWquarter_.csv"))
+write.csv(quarterly, paste0(localDir, "/QCEWquarter_.csv"), row.names = F)
 save(quarterly, file = paste0(localDir, "/QCEWquarter_.RData"))
 
 zip(paste0(localDir, "/QCEW_.zip"), 
     files = c(paste0(localDir, "/QCEW_.csv"),
               paste0(localDir, "/QCEWAnnual_.csv"),
               paste0(localDir, "/QCEWquarter_.csv")))
+
+#Remove all extra information!
 
 print(paste0("Finished 0-QCEW at ", Sys.time()))

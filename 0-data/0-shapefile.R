@@ -9,7 +9,7 @@ print(paste0("Started 0-shapefile at ", Sys.time()))
 library(rgdal)
 library(maptools)
 
-localDir   <- "Shapefiles"
+localDir   <- "0-data/Shapefiles"
 tempDir    <- tempdir()
 if (!file.exists(localDir)) dir.create(localDir)
 

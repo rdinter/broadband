@@ -1,14 +1,13 @@
 #Started: 10-15-2014
-#Last Update: 12-10-2014
+#Last Update: 3-16-2015
 #Robert Dinterman, NCSU Economics PhD Student
 
 print(paste0("Started 0-control-data at ", Sys.time()))
 
-rm(list=ls())
 tempDir <- tempdir()
 
 # Create a directory for the data
-localDir <- "Controls"
+localDir <- "0-data/Controls"
 if (!file.exists(localDir)) dir.create(localDir)
 
 ##### Population Data 2000 to 2010
@@ -20,7 +19,7 @@ POP      <- read.csv(file)
 POP$FIPS <- 1000*POP$STATE+POP$COUNTY
 
 ### Population from 2010 to 2012
-unzip("Controls/PEP_2012_PEPANNRES.zip",exdir=tempDir)
+unzip(paste0(localDir, "/PEP_2012_PEPANNRES.zip"),exdir=tempDir)
 list.files(tempDir)
 POP1        <- read.csv(paste0(tempDir, "/PEP_2012_PEPANNRES_with_ann.csv"))
 POP1        <- POP1[,c(2,6:8)]
@@ -30,13 +29,14 @@ names(POP1) <- c("FIPS", "POPESTIMATE2010_", "POPESTIMATE2011",
 data        <- merge(POP, POP1, by = c("FIPS"), all.x=T)
 rm(POP,POP1)
 
-### Quick Facts: 2008 to 2012
+### Quick Facts: 2008 to 2013
+# http://quickfacts.census.gov/qfd/download_data.html
 url          <- "http://quickfacts.census.gov/qfd/download/DataSet.txt"
-file         <- paste0(localDir,'/Control08-12.txt')
+file         <- paste0(localDir,'/Control08-13.txt')
 if (!file.exists(file)) download.file(url, file)
 qfact        <- read.csv(file)
-vars         <- c("fips", "RHI225212", "EDU685212", "HSG495212",
-                  "INC110212", "LND110210", "POP060210")
+vars         <- c("fips", "RHI225213", "EDU685213", "HSG495213",
+                  "INC110213", "LND110210", "POP060210")
 qfact        <- qfact[, vars]
 names(qfact) <- c("FIPS", "BLACK", "EDUC", "MEDHOMVAL",
                   "MEDHHINC", "AREA", "POPSQ2010")
@@ -46,10 +46,10 @@ rm(qfact)
 # 2007 Household Income and Poverty
 #https://www.census.gov/did/www/saipe/data/statecounty/data/2007.html
 url <- "http://www.census.gov/did/www/saipe/downloads/estmod07/est07ALL.xls"
-file         <- paste0(localDir,'/poverty07.xls')
+file         <- paste0(localDir,"/poverty07.xls")
 if (!file.exists(file)) download.file(url, file)
 # Need to do something to change .xls to .csv
-pov          <- read.csv("Controls/est07ALL.csv")
+pov          <- read.csv(paste0(localDir, "/est07ALL.csv")) #NEEDS TO BE read.xls
 pov$FIPS     <- 1000*pov$State.FIPS + pov$County.FIPS
 pov          <- pov[,c("FIPS", "Poverty.Estimate.All.Ages",
                        "Poverty.Percent.All.Ages",
@@ -94,6 +94,19 @@ names(hwy)   <- c("FIPS",  "HWYCOUNT", "HWYAREA", "HWYMEAN", "HWYSUM")
 data         <- merge(data, hwy, by = "FIPS", all.x = T)
 rm(hwy)
 
-write.csv(data,"Controls/controls.csv")
+### Share of Population Age
+age          <- read.csv(paste0(localDir, "/pop-share-2000.csv"),
+                         stringsAsFactors = F)
+age          <- age[, c("GEO.id2", "HC02_VC21", "HC06_VC21",
+                        "HC02_VC27", "HC06_VC27",
+                        "HC02_VC30", "HC06_VC30",
+                        "HC02_VC41")]
+names(age)   <- c("FIPS", "Under18_2000", "Under18_2000_per", "Pop-18-64_2000",
+                  "Pop-18-64_2000_per", "Over64_2000", "Over64_2000_per",
+                  "Median_age_2000")
+data         <- merge(data, age, by = "FIPS", all.x = T)
+rm(age)
+
+write.csv(data, paste0(localDir, "/controls.csv"))
 
 print(paste0("Finished 0-control-data at ", Sys.time()))

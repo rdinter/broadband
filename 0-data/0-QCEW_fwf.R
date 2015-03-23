@@ -8,13 +8,15 @@
 # http://www.bls.gov/cew/datatoc.htm
 print(paste0("Started 0-QCEW at ", Sys.time()))
 
-library(reshape2)
 library(readr)
+library(reshape2)
 
 # Create a directory for the data
 localDir <- "0-data/Quarterly Census of Employment and Wages"
-tempDir  <- tempdir()
 if (!file.exists(localDir)) dir.create(localDir)
+
+tempDir  <- tempdir()
+unlink(tempDir, recursive = T)
 
 ##### QCEW Data
 years  <- seq(1990,2014)
@@ -22,12 +24,12 @@ url    <- "http://www.bls.gov/cew/data/files/"
 files  <- matrix(NA, nrow = length(years))
 for (i in years){
   temp <- paste0(url, i, "/enb/", i, "_all_enb.zip")
-  file <- paste(tempDir, basename(temp), sep = "/")
+  file <- paste(localDir, basename(temp), sep = "/")
   files[i - years[1] + 1,] <- file
   if (!file.exists(file)) download.file(temp, file)
 }
 
-tempDirr <- paste0(tempDir, "/temp")
+# tempDirr <- paste0(tempDir, "/temp")
 fixed    <- c(3,5,1,1,1,6,4,2,
               1,8,9,9,9,15,15,13,8,
               1,8,9,9,9,15,15,13,8,
@@ -39,14 +41,15 @@ naics    <- c("10", "11", "21", "22", "23", "31-33", "42", "44-45", "48-49", "51
 data     <- data.frame()
 
 for (i in files){
-  if (!file.exists(tempDirr)) dir.create(tempDirr)
-  unzip(i,exdir=tempDirr)
-  j5      <- list.files(paste0(tempDirr, "/county/"))[1:51]
+#   if (!file.exists(tempDirr)) dir.create(tempDirr)
+  unzip(i, exdir = tempDir)
+  j5      <- list.files(paste0(tempDir, "/county/"))[1:51]
   for (j in j5){
-    j6    <- read_fwf(paste0(tempDirr, "/county/", j), fwf_widths(fixed))
+    j6    <- read_fwf(paste0(tempDir, "/county/", j), fwf_widths(fixed),
+                      progress = F)
     data  <- rbind(data, subset(j6, X4==0 & (X5==0 | X5==5) & X6 %in% naics))  
   }
-  unlink(tempDirr, recursive=T)
+  unlink(tempDir, recursive = T)
   print(paste0("Finished ", basename(i), " at ", Sys.time()))
 }
 names = c("survey", "FIPS", "datatype", "sizecode", "ownership", "NAICS",

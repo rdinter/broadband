@@ -12,7 +12,7 @@ library(plyr)
 library(reshape2)
 
 # Create a directory for the data
-localDir <- "IRS"
+localDir <- "0-data/IRS"
 tempDir  <- tempdir()
 if (!file.exists(localDir)) dir.create(localDir)
 

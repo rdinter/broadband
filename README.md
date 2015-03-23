@@ -14,13 +14,22 @@ This project utilizes R and RStudio for downloading, tidying, summarizing, and a
 1. file: 1-...
 
 # Packages Needed
-* gdata
-* maptools
-* plyr
-* raster
-* reshape2
-* rgdal
-* spdep
+Do need to install the readr package from [Hadley Wickham's Github](https://github.com/hadley/readr) with:
+
+```R
+# install.packages("devtools")
+devtools::install_github("hadley/readr")
+```
+
+Further, other packages needed include:
+
+* `gdata`
+* `maptools`
+* `plyr`
+* `raster`
+* `reshape2`
+* `rgdal`
+* `spdep`
 
 <!--
 # Cheat Sheet

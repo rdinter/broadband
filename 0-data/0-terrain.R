@@ -13,9 +13,9 @@ library(raster)
 tempDir <- tempdir()
 
 # Create a directory for the data
-localDir   <- 'Terrain'
+localDir   <- "0-data/Terrain"
 if (!file.exists(localDir)) dir.create(localDir)
-load("Shapefiles/Lower48_2010_county.RData")
+load("0-data/Shapefiles/Lower48_2010_county.RData")
 
 ## Get elevation data
 elevation <- getData("alt", country = "USA", path = localDir)

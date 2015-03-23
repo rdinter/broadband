@@ -11,7 +11,7 @@ print(paste0("Started 0-QCEW at ", Sys.time()))
 library(reshape2)
 
 # Create a directory for the data
-localDir <- "Quarterly Census of Employment and Wages"
+localDir <- "0-data/Quarterly Census of Employment and Wages"
 tempDir  <- tempdir()
 if (!file.exists(localDir)) dir.create(localDir)
 

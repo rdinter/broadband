@@ -8,7 +8,7 @@ rm(list=ls())
 tempDir <- tempdir()
 
 # Create a directory for the data
-localDir <- "Permits"
+localDir <- "0-data/Permits"
 files    <- list.files(paste0(localDir,"/Raw"), pattern = ".*.txt$") #files ending in .txt
 
 names    <- c("year", "STFIPS",	"CFIPS", "Region", "Division", "County",

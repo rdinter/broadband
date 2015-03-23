@@ -1,6 +1,3 @@
----
-output: pdf_document
----
 # Overview
 This repository is for ongoing projects involving analysis of the economic impact of broadband technologies across the United States. The main goals of the analysis is to determine:
 

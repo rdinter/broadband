@@ -12,7 +12,7 @@ This project utilizes R and RStudio for downloading, tidying, summarizing, and a
   + This is not optimized, it is best to compile all the data overnight.
 1. file: 1-...
 
-# Packages Needed
+## Packages Needed
 Do need to install the [readxl](https://github.com/hadley/readxl) and [readr](https://github.com/hadley/readr) packages from [Hadley Wickham's Github](https://github.com/hadley) with:
 
 ```R
@@ -23,13 +23,6 @@ devtools::install_github("hadley/readr")
 
 Further, other packages needed include: `gdata`, `maptools`, `plyr`, `raster`, `reshape2`, `rgdal`, and `spdep`.
 
-* `gdata`
-* `maptools`
-* `plyr`
-* `raster`
-* `reshape2`
-* `rgdal`
-* `spdep`
 
 <!--
 # Cheat Sheet

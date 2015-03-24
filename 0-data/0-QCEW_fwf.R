@@ -12,7 +12,7 @@ library(readr)
 library(reshape2)
 
 # Create a directory for the data
-localDir <- "0-data/Quarterly Census of Employment and Wages"
+localDir <- "0-data/QCEW"
 if (!file.exists(localDir)) dir.create(localDir)
 
 tempDir  <- tempdir()

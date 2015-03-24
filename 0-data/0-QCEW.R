@@ -1,5 +1,3 @@
-#Started: 10-15-2014
-#Last Update: 10-15-2014
 #Robert Dinterman, NCSU Economics PhD Student
 
 # Downloading Quarterly Census of Employment and Wages Program
@@ -11,12 +9,14 @@ print(paste0("Started 0-QCEW at ", Sys.time()))
 library(reshape2)
 
 # Create a directory for the data
-localDir <- "0-data/Quarterly Census of Employment and Wages"
-tempDir  <- tempdir()
+localDir <- "0-data/QCEW"
 if (!file.exists(localDir)) dir.create(localDir)
 
+tempDir  <- tempdir()
+unlink(tempDir, recursive = T)
+
 ##### QCEW Data
-years  <- seq(1990,2014)
+years  <- seq(1990,2013)
 url    <- "http://www.bls.gov/cew/data/files/"
 files  <- matrix(NA, nrow = length(years))
 for (i in years){

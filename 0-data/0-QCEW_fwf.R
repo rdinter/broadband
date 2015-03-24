@@ -42,7 +42,8 @@ data     <- data.frame()
 
 for (i in files){
   unzip(i, exdir = tempDir)
-  j5      <- list.files(paste0(tempDir, "/county/"), pattern = "*.enb")
+  j5      <- list.files(paste0(tempDir, "/county/"), pattern = "*.enb",
+                        ignore.case = T)
   j5      <- j5[-c(grep("vi", j5, ignore.case = T), #removes Virgin Islands
                    grep("pr", j5, ignore.case = T))] #removes Puerto Rico
   for (j in j5){

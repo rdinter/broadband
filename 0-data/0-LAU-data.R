@@ -9,7 +9,7 @@ library(reshape2)
 #ftp://ftp.bls.gov/pub/time.series/la/
 year1    <- 1990
 year2    <- 2014
-localDir <- "0-data/Local Area Unemployment"
+localDir <- "0-data/LAU"
 if (!file.exists(localDir)) dir.create(localDir)
 
 #url       <- "ftp://ftp.bls.gov/pub/time.series/la/"

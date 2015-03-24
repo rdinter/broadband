@@ -1,5 +1,3 @@
-#Started: 10-15-2014
-#Last Update: 10-18-2014
 #Robert Dinterman, NCSU Economics PhD Student
 
 print(paste0("Started 0-shapefile at ", Sys.time()))
@@ -10,8 +8,9 @@ library(rgdal)
 library(maptools)
 
 localDir   <- "0-data/Shapefiles"
-tempDir    <- tempdir()
 if (!file.exists(localDir)) dir.create(localDir)
+tempDir    <- tempdir()
+unlink(tempDir, recursive = T)
 
 url = "http://dds.cr.usgs.gov/pub/data/nationalatlas/countyp020_nt00009.tar.gz"
 file       <- paste(localDir, basename(url) ,sep = "/")
@@ -35,7 +34,8 @@ USA$FIPS   <- as.numeric(as.character(USA$FIPS))
 USA@data   <- data.frame(USA@data,usa[match(USA$FIPS, usa$FIPS),])
 USA        <- USA[order(USA$FIPS),]
 
-writeOGR(USA, localDir, "Lower48_2010_county", "ESRI Shapefile")
+writeOGR(USA, localDir, "Lower48_2010_county", "ESRI Shapefile",
+         overwrite_layer = T)
 save(all, file = paste0(localDir, "/county2010.RData"))
 save(USA, file = paste(localDir, "Lower48_2010_county.RData", sep = "/"))
 
@@ -71,6 +71,6 @@ save(xW, W, file = paste0(localDir, "/contigW.RData"))
 #write.csv(neighbors, "neighborsmatrix.csv")
 #write.csv(count, "neighborscount.csv")
 
-
+rm(list = ls())
 
 print(paste0("Finished 0-shapefile at ", Sys.time()))

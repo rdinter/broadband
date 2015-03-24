@@ -1,24 +1,27 @@
 # Overview
-This repository is for ongoing projects involving analysis of the economic impact of broadband technologies across the United States. The main goals of the analysis is to determine:
+This repository is for ongoing projects involving analysis of the economic impact of broadband technologies across the United States. The main goals of the analysis are:
 
-* Whether there is a causal connection between broadband infrastructure and increases in employment.
-* Estimating 
+* Visualizing broadband growth in the United States.
+* Determining whether there is a causal connection between broadband infrastructure and increases in employment.
+* Estimating economic impacts associated with broadband deployment.
 
 # Order of Execution
 This project utilizes R and RStudio for downloading, tidying, summarizing, and analyzing data across various sources.
 
-0. file: 0-data-compile.R (should take around...)
+0. file: 0-data-compile.R (some data files are not available due to confidentiality)
+  + This is not optimized, it is best to compile all the data overnight.
 1. file: 1-...
 
 # Packages Needed
-Do need to install the readr package from [Hadley Wickham's Github](https://github.com/hadley/readr) with:
+Do need to install the [readxl](https://github.com/hadley/readxl) and [readr](https://github.com/hadley/readr) packages from [Hadley Wickham's Github](https://github.com/hadley) with:
 
 ```R
 # install.packages("devtools")
+devtools::install_github("hadley/readxl")
 devtools::install_github("hadley/readr")
 ```
 
-Further, other packages needed include:
+Further, other packages needed include: `gdata`, `maptools`, `plyr`, `raster`, `reshape2`, `rgdal`, and `spdep`.
 
 * `gdata`
 * `maptools`

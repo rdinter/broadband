@@ -51,7 +51,8 @@ for (i in files){
                      error = function(e){
                        read.fwf(paste0(tempDir, "/county/", j), fwf_widths(fixed))
     })
-    data  <- rbind(data, subset(j6, X4==0 & (X5==0 | X5==5) & X6 %in% naics))  
+    data  <- rbind(data, subset(j6, X4==0 & (X5==0 | X5==5) & X6 %in% naics))
+    rm(j6)
   }
   unlink(tempDir, recursive = T)
   print(paste0("Finished ", basename(i), " at ", Sys.time()))
@@ -118,6 +119,6 @@ zip(paste0(localDir, "/QCEW_.zip"),
               paste0(localDir, "/QCEWAnnual_.csv"),
               paste0(localDir, "/QCEWquarter_.csv")))
 
-#Remove all extra information!
+rm(list = ls())
 
 print(paste0("Finished 0-QCEW at ", Sys.time()))

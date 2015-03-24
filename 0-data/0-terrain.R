@@ -1,8 +1,6 @@
-#Started: 10-15-2014
-#Last Update: 10-15-2014
 #Robert Dinterman, NCSU Economics PhD Student
 
-# Terrain
+# Terrain, this will take a substantial amount of time.
 
 print(paste0("Started 0-terrain at ", Sys.time()))
 
@@ -11,6 +9,7 @@ library(rgdal)
 library(raster)
 
 tempDir <- tempdir()
+unlink(tempDir, recursive = T)
 
 # Create a directory for the data
 localDir   <- "0-data/Terrain"
@@ -30,5 +29,8 @@ cellStats(x, mean)
 data      <- extract(x, USA, fun = mean, na.rm = T, weights = T, df = T)
 data$ID   <- getSpPPolygonsIDSlots(USA)
 
-write.csv(data, paste(localDir, "terrain.csv", sep = "/"))
+write.csv(data, paste(localDir, "terrain.csv", sep = "/"), row.names = F)
+
+rm(list = ls())
+
 print(paste0("Finished 0-terrain at ", Sys.time()))

@@ -18,8 +18,8 @@ if (!file.exists(localDir)) dir.create(localDir)
 tempDir  <- tempdir()
 unlink(tempDir, recursive = T)
 
-##### QCEW Data
-years  <- seq(1990,2014)
+##### QCEW Data, as of 3-23-2015 the 2014 Data has not been released.
+years  <- seq(1990,2013)
 url    <- "http://www.bls.gov/cew/data/files/"
 files  <- matrix(NA, nrow = length(years))
 for (i in years){
@@ -41,12 +41,16 @@ naics    <- c("10", "11", "21", "22", "23", "31-33", "42", "44-45", "48-49", "51
 data     <- data.frame()
 
 for (i in files){
-#   if (!file.exists(tempDirr)) dir.create(tempDirr)
   unzip(i, exdir = tempDir)
-  j5      <- list.files(paste0(tempDir, "/county/"))[1:51]
+  j5      <- list.files(paste0(tempDir, "/county/"), pattern = "*.enb")
+  j5      <- j5[-c(grep("vi", j5, ignore.case = T), #removes Virgin Islands
+                   grep("pr", j5, ignore.case = T))] #removes Puerto Rico
   for (j in j5){
-    j6    <- read_fwf(paste0(tempDir, "/county/", j), fwf_widths(fixed),
-                      progress = F)
+    j6   <- tryCatch(read_fwf(paste0(tempDir, "/county/", j), fwf_widths(fixed),
+                              progress = F),
+                     error = function(e){
+                       read.fwf(paste0(tempDir, "/county/", j), fwf_widths(fixed))
+    })
     data  <- rbind(data, subset(j6, X4==0 & (X5==0 | X5==5) & X6 %in% naics))  
   }
   unlink(tempDir, recursive = T)

@@ -1,5 +1,3 @@
-#Started: 11-19-2014
-#Last Update: 11-19-2014
 #Robert Dinterman, NCSU Economics PhD Student
 
 print(paste0("Started 0-permit-data at ", Sys.time()))
@@ -41,7 +39,9 @@ permits$year[permits$year == 9699] <- 1996
 permits$year[permits$year == 9799] <- 1997
 permits$year[permits$year == 9899] <- 1998
 
-write.csv(permits, file = paste0(localDir, "/permits.csv"))
+write.csv(permits, file = paste0(localDir, "/permits.csv"), row.names = F)
 save(permits, file = paste0(localDir, "/permits.RData"))
+
+rm(list = ls())
 
 print(paste0("Finished 0-permit-data at ", Sys.time()))

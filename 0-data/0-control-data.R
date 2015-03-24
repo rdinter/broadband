@@ -1,8 +1,8 @@
-#Started: 10-15-2014
-#Last Update: 3-16-2015
 #Robert Dinterman, NCSU Economics PhD Student
 
 print(paste0("Started 0-control-data at ", Sys.time()))
+
+library(readxl)
 
 tempDir <- tempdir()
 
@@ -19,7 +19,7 @@ POP      <- read.csv(file)
 POP$FIPS <- 1000*POP$STATE+POP$COUNTY
 
 ### Population from 2010 to 2012
-unzip(paste0(localDir, "/PEP_2012_PEPANNRES.zip"),exdir=tempDir)
+unzip(paste0(localDir, "/PEP_2012_PEPANNRES.zip"), exdir = tempDir)
 list.files(tempDir)
 POP1        <- read.csv(paste0(tempDir, "/PEP_2012_PEPANNRES_with_ann.csv"))
 POP1        <- POP1[,c(2,6:8)]
@@ -50,6 +50,10 @@ file         <- paste0(localDir,"/poverty07.xls")
 if (!file.exists(file)) download.file(url, file)
 # Need to do something to change .xls to .csv
 pov          <- read.csv(paste0(localDir, "/est07ALL.csv")) #NEEDS TO BE read.xls
+    # pov          <- read_excel(paste0(localDir, "/poverty07.xls"), skip = 2)
+    # names(pov)   <- gsub(" ", ".", names(pov)) #Problem with read_excel names
+    # names(pov)   <- gsub("-", ".", names(pov))
+
 pov$FIPS     <- 1000*pov$State.FIPS + pov$County.FIPS
 pov          <- pov[,c("FIPS", "Poverty.Estimate.All.Ages",
                        "Poverty.Percent.All.Ages",
@@ -107,6 +111,8 @@ names(age)   <- c("FIPS", "Under18_2000", "Under18_2000_per", "Pop-18-64_2000",
 data         <- merge(data, age, by = "FIPS", all.x = T)
 rm(age)
 
-write.csv(data, paste0(localDir, "/controls.csv"))
+write.csv(data, paste0(localDir, "/controls.csv"), row.names = F)
+
+rm(list = ls())
 
 print(paste0("Finished 0-control-data at ", Sys.time()))

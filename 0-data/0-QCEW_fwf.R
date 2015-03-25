@@ -84,7 +84,7 @@ annual <- data[, c("year", "FIPS", "NAICS", "ownership", "establishmentsA",
                    "employA", "wagesA", "taxwageA", "contrA",
                    "avgwageA", "avgpayA")]
 write.csv(annual, paste0(localDir, "/QCEWAnnual_.csv"), row.names = F)
-save(annual, file = paste0(localDir, "/QCEWAnnual_.RData"), row.names = F)
+save(annual, file = paste0(localDir, "/QCEWAnnual_.RData"))
 
 #Quarterly Data
 data1 <- data[,c("year", "FIPS", "NAICS", "ownership", "establishments1",

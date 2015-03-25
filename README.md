@@ -10,7 +10,8 @@ This project utilizes R and RStudio for downloading, tidying, summarizing, and a
 
 0. file: 0-data-compile.R (some data files are not available due to confidentiality)
   + This is not optimized, it is best to compile all the data overnight.
-1. file: 1-...
+1. file: 1-data.R will tidy up the data, (currently working on updating)
+2. file: 2- ...
 
 ## Packages Needed
 Do need to install the [readxl](https://github.com/hadley/readxl) and [readr](https://github.com/hadley/readr) packages from [Hadley Wickham's Github](https://github.com/hadley) with:

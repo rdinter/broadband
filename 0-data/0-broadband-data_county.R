@@ -45,7 +45,7 @@ for (i in files) {
   data = rbind.fill(data, inp)
   rm(inp)
 }
-
+# The 2008 names have a different name.
 # apply(data, 2, function(x) sum(is.na(x)))
 
 miss <- is.na(data$rfc_per_1000_hhs)
@@ -53,10 +53,8 @@ data$rfc_per_1000_hhs[miss] <- data$rfhsc_per_1000_hhs[miss]
 
 miss <- is.na(data$rfc_per_1000_hhs_btop)
 data$rfc_per_1000_hhs_btop[miss] <- data$rfhsc_per_1000_hhs_btop[miss]
-miss <- is.na(data$rfc_per_1000_hhs_btop)
-data$rfc_per_1000_hhs_btop[miss] <- data$rfc_per_1000_hhs_nbp[miss]
 
-data <- data[, -c(13, 14, 15)]
+data$rfhsc_per_1000_hhs <- data$rfhsc_per_1000_hhs_btop <- NULL
 
 write.csv(data, paste0(localDir, "/FCC08-13.csv"), row.names = F)
 

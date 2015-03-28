@@ -19,6 +19,7 @@ temp <- temp[,c("FIPS", "year", "rfc_per_1000_hhs", "tmw_prov",
 data <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
 load("0-data/QCEW/QCEWAnnual_.RData") #employment, called annual
+qcew <- read_csv("0-data/QCEW/QCEW_.csv")
 temp <- subset(annual, year >= 2000 & ownership == 0)
 temp <- temp[,c("year", "FIPS", "establishmentsA", "employA", "wagesA",
                 "taxwageA", "contrA", "avgwageA", "avgpayA")]
@@ -98,19 +99,21 @@ data <- merge(data, temp, by = "FIPS", all.x = T)
 
 
 temp <- read_csv("0-data/Controls/controls.csv") #controls
-temp <- temp[,c("FIPS", "ESTIMATESBASE2000", "POPESTIMATE2000",
-                "POPESTIMATE2001", "POPESTIMATE2002", "POPESTIMATE2003",
-                "POPESTIMATE2004", "POPESTIMATE2005", "POPESTIMATE2006",
-                "POPESTIMATE2007", "POPESTIMATE2008", "POPESTIMATE2009",
-                "CENSUS2010POP", "POPESTIMATE2010", "POPESTIMATE2010_",
-                "POPESTIMATE2011", "POPESTIMATE2012", "BLACK", "EDUC",
-                "MEDHOMVAL", "MEDHHINC", "AREA", "POPSQ2010",
-                "Poverty.Estimate.All.Ages", "Poverty.Percent.All.Ages",
-                "Poverty.Estimate.Under.Age.18", "Poverty.Percent.Under.Age.18",
-                "Poverty.Estimate.Ages.5.17", "Poverty.Percent.Ages.5.17",
-                "share", "Scale", "climate", "topo", "ruc", "HWYCOUNT", 
-                "HWYAREA",
-                "HWYMEAN", "HWYSUM")]
+temp <- subset(temp, select = -c(SUMLEV, REGION, DIVISION, STATE, COUNTY,
+                                 STNAME, CTYNAME))
+# temp <- temp[,c("FIPS", "ESTIMATESBASE2000", "POPESTIMATE2000",
+#                 "POPESTIMATE2001", "POPESTIMATE2002", "POPESTIMATE2003",
+#                 "POPESTIMATE2004", "POPESTIMATE2005", "POPESTIMATE2006",
+#                 "POPESTIMATE2007", "POPESTIMATE2008", "POPESTIMATE2009",
+#                 "CENSUS2010POP", "POPESTIMATE2010", "POPESTIMATE2010_",
+#                 "POPESTIMATE2011", "POPESTIMATE2012", "BLACK", "EDUC",
+#                 "MEDHOMVAL", "MEDHHINC", "AREA", "POPSQ2010",
+#                 "Poverty.Estimate.All.Ages", "Poverty.Percent.All.Ages",
+#                 "Poverty.Estimate.Under.Age.18", "Poverty.Percent.Under.Age.18",
+#                 "Poverty.Estimate.Ages.5.17", "Poverty.Percent.Ages.5.17",
+#                 "share", "Scale", "climate", "topo", "ruc", "HWYCOUNT", 
+#                 "HWYAREA",
+#                 "HWYMEAN", "HWYSUM")]
 
 check <- temp$FIPS %in% data$FIPS
 temp$FIPS[!check] #state levels with 000
@@ -137,6 +140,7 @@ data$FIPS[!check] #state levels with 999, missing 2013, 2016, 2020, 2050, 2060,
 data <- merge(data, temp, by = "FIPS", all.x = T)
 
 temp <- read_csv("0-data/Permits/permits.csv") #Residential Permit Data
+names(temp) <- gsub("-", ".", names(temp))
 temp <- subset(temp, year == 2007)
 
 temp$permitbuild <- temp$Bldgs_1.unit + temp$Bldgs_2.units + temp$Bldgs3.4_units +

@@ -69,7 +69,7 @@ rm(pov)
 
 ### Vacation Homes
 vaca         <- read.csv("http://www4.ncsu.edu/~rdinter/docs/acs2009.csv")
-vaca$share   <- vaca$Vacation / vaca$Total
+vaca$share   <- 100*vaca$Vacation / vaca$Total
 vaca         <- vaca[, -c(2:6)]
 data         <- merge(data, vaca, by = "FIPS", all.x = T)
 rm(vaca)

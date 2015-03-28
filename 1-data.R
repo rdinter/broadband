@@ -5,6 +5,8 @@
 rm(list = ls())
 
 library(readr)
+load("0-data/Shapefiles/contigW.RData")
+
 
 # Data Combining ----------------------------------------------------------
 
@@ -19,22 +21,22 @@ temp <- temp[,c("FIPS", "year", "rfc_per_1000_hhs", "tmw_prov",
 data <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
 load("0-data/QCEW/QCEWAnnual_.RData") #employment, called annual
-qcew <- read_csv("0-data/QCEW/QCEW_.csv")
+# qcew <- read_csv("0-data/QCEW/QCEW_.csv")
 temp <- subset(annual, year >= 2000 & ownership == 0)
 temp <- temp[,c("year", "FIPS", "establishmentsA", "employA", "wagesA",
                 "taxwageA", "contrA", "avgwageA", "avgpayA")]
 temp <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
-#NAICS Classifications
-annual[is.na(annual)] <- -1
-qcew       <-subset(annual, ownership == 5) #Only Private
-qcew$NAICS <- gsub("\\s","", qcew$NAICS)
-qcew$NAICS <- factor(qcew$NAICS)
-qcew       <- qcew[,c("FIPS", "year", "NAICS",
-                      "employA", "establishmentsA", "wagesA")]
-NAICS      <- reshape(qcew, idvar = c("FIPS","year"), timevar = "NAICS",
-                v.names = c("employA", "establishmentsA", "wagesA"),
-                direction = "wide")
+# #NAICS Classifications
+# annual[is.na(annual)] <- -1
+# qcew       <-subset(annual, ownership == 5) #Only Private
+# qcew$NAICS <- gsub("\\s","", qcew$NAICS)
+# qcew$NAICS <- factor(qcew$NAICS)
+# qcew       <- qcew[,c("FIPS", "year", "NAICS",
+#                       "employA", "establishmentsA", "wagesA")]
+# NAICS      <- reshape(qcew, idvar = c("FIPS","year"), timevar = "NAICS",
+#                 v.names = c("employA", "establishmentsA", "wagesA"),
+#                 direction = "wide")
 rm(annual)
 
 ### Change FIPS with 999 at end to 000
@@ -173,11 +175,10 @@ data$FIPS[!check] #Missing state levels with 000 and: 2068 2105 2164 2195 2198
 data <- merge(data, temp, by = "FIPS", all.x = T)
 rm(temp, check, place)
 
-save(data, file = "1-data.RData")
+save(data, xW, W, file = "1-data.RData")
 
 # Summary Statistics ------------------------------------------------------
 load("1-data.RData")
-load("0-data/Shapefiles/contigW.RData")
 library(spdep)
 
 keep <- data$FIPS %in% as.numeric(row.names(W))

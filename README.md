@@ -22,7 +22,7 @@ devtools::install_github("hadley/readxl")
 devtools::install_github("hadley/readr")
 ```
 
-Further, other packages needed include: `gdata`, `maptools`, `plyr`, `raster`, `reshape2`, `rgdal`, and `spdep`.
+Further, other packages needed include: `gdata`, `ggplot2`, `maptools`, `plyr`, `raster`, `reshape2`, `rgdal`, `spdep`, `xtable`.
 
 
 <!--

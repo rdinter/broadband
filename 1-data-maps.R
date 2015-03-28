@@ -34,8 +34,7 @@ data$migrationchange[data$migrationchange < bottom] <- bottom
 data$broadband <- data$total_prov.2010B - data$total_prov.2008B
 
 data$bb <- cut(data$total_prov.2008B, breaks = c(0, 3, 7, 11, 15, 19, 50))
-levels(data$bb) <- c("0 to 3", "4 to 7", "8 to 11", "12 to 15", "16 to 19",
-                     "more than 20")
+levels(data$bb) <- c("0-3", "4-7", "8-11", "12-15", "16-19", ">20")
 
 data$jobs  <- data$employA.2010 - data$employA.2008
 top        <- quantile(data$jobs, 0.9)
@@ -150,11 +149,11 @@ bb08 <- usa.plot + geom_polygon(aes(fill = bb)) +
     theme(axis.ticks = element_blank(), axis.text.y = element_blank(),
         plot.title = element_text(face="bold"), axis.text.x = element_blank(),
         panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
-        panel.background = element_blank(),
-        legend.position = "bottom", legend.direction = "horizontal")
+        panel.background = element_blank(), legend.position = c(1,0),
+        legend.justification = c(1,0), legend.background = element_blank())
 png(filename = "Figures/broadband-2008.png", width = 600, units = "px")
 print(bb08)
 dev.off()
 
-bb08 + labs(x='',y='', title="Broadband Providers, 2008")
+bb08 + labs(x="",y="", title="Broadband Providers, 2008")
 ggsave("Figures/broadband-2008.pdf", width = 9, height = 7.5)

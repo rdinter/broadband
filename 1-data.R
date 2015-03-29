@@ -20,11 +20,16 @@ temp <- temp[,c("FIPS", "year", "rfc_per_1000_hhs", "tmw_prov",
                 "total_residential_prov_nbp")]
 data <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
-load("0-data/QCEW/QCEWAnnual_.RData") #employment, called annual
+load("0-data/QCEW/QCEWAnnual_2.RData") #employment, called annual
 # qcew <- read_csv("0-data/QCEW/QCEW_.csv")
-temp <- subset(annual, year >= 2000 & ownership == 0)
-temp <- temp[,c("year", "FIPS", "establishmentsA", "employA", "wagesA",
-                "taxwageA", "contrA", "avgwageA", "avgpayA")]
+temp <- subset(annual, year >= 2000 & own_code == 0)
+vars <- c("year", "FIPS", "annual_avg_estabs_count", "annual_avg_emplvl",
+          "total_annual_wages", "taxable_annual_wages", "annual_contributions",
+          "annual_avg_wkly_wage", "avg_annual_pay")
+#Location Quotients could be cool...
+temp <- temp[, vars]
+names(temp) <- c("year", "FIPS", "establishmentsA", "employA", "wagesA",
+                 "taxwageA", "contrA", "avgwageA", "avgpayA")
 temp <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
 # #NAICS Classifications

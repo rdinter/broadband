@@ -110,7 +110,7 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   
   #Check for residual autocorrelation
   print("Residual Autocorrelation #1")
-  print(moran.test(rtrue, xW, randomisation = F))
+  print(moran.test(rtrue, xW, randomisation = F, alternative = "two.sided"))
   gm            <- gmproc(rtrue,W)
 #   sperr         <- c(gm$p, gm$p.s)
   
@@ -130,7 +130,7 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
             t(t(reg2$coefficients))
   print("Residual Autocorrelation #2")
-  print(moran.test(rtrue, xW, randomisation = F))
+  print(moran.test(rtrue, xW, randomisation = F, alternative = "two.sided"))
   
   work$r <- rtrue
   gm     <- data.frame(matrix(unlist(gm), nrow = 2),

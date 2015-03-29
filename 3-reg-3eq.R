@@ -84,11 +84,12 @@ est$share       <- data$share
 est$tpi         <- data$tpi
 est$EDUC        <- data$EDUC
 est$permitunit  <- data$permitunit
+est$share65     <- data$Over64_2000_per
 est[is.na(est)] <- 0
 est$ones        <- 1
 vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
                      "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
-                     "taxwageA.2008", "permitunit")
+                     "taxwageA.2008", "permitunit", "share65")
 est[, vars]     <- scale(est[, vars])
 
 # Estimation Procedures ---------------------------------------------------
@@ -112,7 +113,7 @@ Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)
 endo1        <- c("WY2", "y2", "WY3", "y3") #endogenous variables
 xnames1      <- c("y1_l", "y2_l", "Wy2_l", "y3_l", "Wy3_l", "ones",
                   "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
-                  "Scale", "share")
+                  "Scale", "share", "share65")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
                        y = "y1", Ph = Ph, xW = xW, W = W)

@@ -5,7 +5,6 @@
 # Load Data ---------------------------------------------------------------
 
 load("1-data.RData")
-load("0-data/Shapefiles/contigW.RData")
 library(xtable)
 
 keep <- data$FIPS %in% as.numeric(row.names(W))

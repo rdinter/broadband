@@ -48,3 +48,48 @@ vars            <- c("MEDHHINC", "MEDHOMVAL", "wagesA.2008",
 
 tab <- cbind(sapply(est[,vars], mean), sapply(est[,vars], sd))
 xtable(tab, digits = -4)
+
+# Summary Statistics ------------------------------------------------------
+load("1-data.RData")
+library(spdep)
+
+keep <- data$FIPS %in% as.numeric(row.names(W))
+data <- data[keep,]
+
+mean(data$total_prov.2008B)
+sd(data$total_prov.2008B)
+mean(data$total_prov.2010B)
+sd(data$total_prov.2010B)
+mean(data$total_prov.2012B)
+sd(data$total_prov.2012B)
+
+mean(data$rfc_per_1000_hhs_btop.2008B)*20
+sd(data$rfc_per_1000_hhs_btop.2008B)*20
+mean(data$rfc_per_1000_hhs_btop.2010B)*20
+sd(data$rfc_per_1000_hhs_btop.2010B)*20
+mean(data$rfc_per_1000_hhs_btop.2012B)*20
+sd(data$rfc_per_1000_hhs_btop.2012B)*20
+
+mean(data$employA.2008)
+sd(data$employA.2008)
+mean(data$employA.2010)
+sd(data$employA.2010)
+mean(data$employA.2012)
+sd(data$employA.2012)
+
+mean(data$establishmentsA.2008)
+sd(data$establishmentsA.2008)
+mean(data$establishmentsA.2010)
+sd(data$establishmentsA.2010)
+mean(data$establishmentsA.2012)
+sd(data$establishmentsA.2012)
+
+mean(data$POPESTIMATE2008)
+sd(data$POPESTIMATE2008)
+mean(data$POPESTIMATE2010)
+sd(data$POPESTIMATE2010)
+mean(data$POPESTIMATE2012)
+sd(data$POPESTIMATE2012)
+
+summary(data$Exmpt_Num.2008)
+summary(data$Exmpt_Num.2010)

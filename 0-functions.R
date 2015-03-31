@@ -40,7 +40,8 @@ table.results <- function(tab, df = 3000){
   results
 }
 
-gmproc <- function(r,W){
+gmproc <- function(r,W, p = 0.7){
+  s = var(r)
   #GM Function
   u = as.matrix(r)
   v = W %*% u
@@ -55,7 +56,7 @@ gmproc <- function(r,W){
   g = matrix(c(t(u) %*% u, t(v) %*% v, t(u) %*% v),
              3) / length(u)
   
-  est = nls(g ~ G %*% c(p, p^2, s), start = list(p = 0.7, s = 1), 
+  est = nls(g ~ G %*% c(p, p^2, s), start = list(p = p, s = s), 
             control = list(warnOnly = T))
   
   j5 = summary(est)[["coefficients"]]

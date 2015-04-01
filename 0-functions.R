@@ -77,6 +77,8 @@ ols.results <- function(model) {
 # Estimation --------------------------------------------------------------
 
 two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
+  require(lmtest)
+  require(spdep)
   
   if (!is.character(n)) (n <- as.character(n))
   if (!is.character(y)) (y <- as.character(y))
@@ -112,7 +114,7 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   print("Residual Autocorrelation #1")
   print(moran.test(rtrue, xW, randomisation = F, alternative = "two.sided"))
   gm            <- gmproc(rtrue,W)
-#   sperr         <- c(gm$p, gm$p.s)
+  #   sperr         <- c(gm$p, gm$p.s)
   
   #Transform due to spatial error, not needed for instruments
   work[, y]      <- work[, y] - gm$p * W %*% work[, y]

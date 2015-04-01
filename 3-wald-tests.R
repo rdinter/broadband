@@ -46,19 +46,19 @@ wald <- function(r, R, VAR){
 
 wald2eq <- function(results, VAR){
   
-  nA1  = "BBS1"
-  nA2  = "y2_lS1"
-  nWA2 = "Wy2_lS1"
-  nA2l = "y2"
-  nWA2l= "WY2"
-  nLP  = "y1_lS1"
+  nA1  = "BB1"
+  nA2  = "y2_l1"
+  nWA2 = "Wy2_l1"
+  nA2l = "y21h"
+  nWA2l= "WY21h"
+  nLP  = "y1_l1"
   
-  nB1  = "BBS2"
-  nB2  = "y1_lS2"
-  nWB2 = "Wy1_lS2"
-  nB2l = "y1"
-  nWB2l= "WY1"
-  nLE  = "y2_lS2"
+  nB1  = "BB2"
+  nB2  = "y1_l2"
+  nWB2 = "Wy1_l2"
+  nB2l = "y12h"
+  nWB2l= "WY12h"
+  nLE  = "y2_l2"
   
   A1   = results[nA1, "DELTA"]
   A2   = results[nA2, "DELTA"]
@@ -74,77 +74,77 @@ wald2eq <- function(results, VAR){
   WB2l = results[nWB2l, "DELTA"]
   LE   = -results[nLE, "DELTA"]
   
-  #alpha 1 test
-  r1       = A1 / LP
-  R1       = vector("numeric", length = nrow(results))
-  names(R1)= rownames(results)
+  #Restrictions
+  rA1       = A1 / LP #alpha_1 = 0
+  rA2       = A2 / LP #alpha_2 = 0
+  rWA2      = WA2 / A2 #phi_E = 0
+  rLP       = LP      #lambda_P = 0
+  rB1       = B1 / LE #beta_1 = 0
+  rB2       = B2 / LE #beta_2 = 0
+  rWB2      = WB2 / B2 #phi_P = 0
+  rLE       = LE      #lambda_E = 0
   
-  R1[nA1]   = 1 / LP
-  R1[nLP]   = A1 / (LP^2)
-  R1[nB2l]  = A1 / B2
-  R1[nWB2l] = A1 / WB2
+  #Placeholders
+  RA1          <- vector("numeric", length = nrow(results))
+  names(RA1)   <- rownames(results)
+  RA1 -> RA2 -> RWA2 -> RLP -> RB1 -> RB2 -> RWB2 -> RLE
   
-  R1 = t(as.matrix(R1))
-  wald1 = t(r1) %*% qr.solve(R1 %*% VAR %*% t(R1)) %*% r1
+  #alpha_1 = 0 test
+  RA1[nA1]   = 1 / LP
+  RA1[nLP]   = A1 / (LP^2)
+  RA1[nB2l]  = A1 / B2
+  RA1[nWB2l] = A1 / WB2
   
-  #alpha 2 test
-  r2       = A2 / LP
-  R2       = vector("numeric", length = nrow(results))
-  names(R2)= rownames(results)
+  #alpha_2 = 0 test
+  RA2[nA2]   = 1 / LP
+  RA2[nWA2]  = A2 / (LP*WA2)
+  RA2[nA2l]  = LE / LP
+  RA2[nWA2l] = (A2*LE) / (LP*WA2)
+  RA2[nLP]   = A2 / (LP^2)
+  RA2[nB2l]  = A2 / B2
+  RA2[nWB2l] = A2 / WB2
   
-  R2[nA2]   = 1 / LP
-  R2[nWA2]  = A2 / (LP*WA2)
-  R2[nA2l]  = LE / LP
-  R2[nWA2l] = (A2*LE) / (LP*WA2)
-  R2[nLP]   = A2 / (LP^2)
-  R2[nB2l]  = A2 / B2
-  R2[nWB2l] = A2 / WB2
+  #beta_1 = 0 test
+  RB1[nB1]   = 1 / LE
+  RB1[nLE]   = B1 / (LE^2)
+  RB1[nA2l]  = B1 / A2
+  RB1[nWA2l] = B1 / WA2
   
-  R2 = t(as.matrix(R2))
-  wald2 = t(r2) %*% qr.solve(R2 %*% VAR %*% t(R2)) %*% r2
+  #beta_2 = 0 test
+  RB2[nB2]   = 1 / LE
+  RB2[nWB2]  = B2 / (LE*WB2)
+  RB2[nB2l]  = LP / LE
+  RB2[nWB2l] = (B2*LP) / (LE*WB2)
+  RB2[nLE]   = B2 / (LE^2)
+  RB2[nA2l]  = B2 / A2
+  RB2[nWA2l] = B2 / WA2
   
-  #beta 1 test
-  r3       = B1 / LE
-  R3       = vector("numeric", length = nrow(results))
-  names(R3)= rownames(results)
+  # WALD TESTING
+  waldalpha1 = wald(rA1, RA1, VAR)
+  waldalpha2 = wald(rA2, RA2, VAR)
   
-  R3[nB1]   = 1 / LE
-  R3[nLE]   = B1 / (LE^2)
-  R3[nA2l]  = B1 / A2
-  R3[nWA2l] = B1 / WA2
+  #   waldalpha  = wald(c(rA1, rA2), cbind(RA1, RA2), VAR)
   
-  R3 = t(as.matrix(R3))
-  wald3 = t(r3) %*% qr.solve(R3 %*% VAR %*% t(R3)) %*% r3
+  waldbeta1  = wald(rB1, RB1, VAR)
+  waldbeta2  = wald(rB2, RB2, VAR)
   
-  #beta 2 test
-  r4       = B2 / LE
-  R4       = vector("numeric", length = nrow(results))
-  names(R4)= rownames(results)
+  #   waldbeta   = wald(c(rB1, rB2), cbind(RB1, RB2), VAR)
   
-  R4[nB2]   = 1 / LE
-  R4[nWB2]  = B2 / (LE*WB2)
-  R4[nB2l]  = LP / LE
-  R4[nWB2l] = (B2*LP) / (LE*WB2)
-  R4[nLE]   = B2 / (LE^2)
-  R4[nA2l]  = B2 / A2
-  R4[nWA2l] = B2 / WA2
+  waldbb     = wald(c(rA1, rB1), cbind(RA1, RB1), VAR)
+  waldpopemp = wald(c(rA2, rB2), cbind(RA2, RB2), VAR)
   
-  R4 = t(as.matrix(R4))
-  wald4 = t(r4) %*% qr.solve(R4 %*% VAR %*% t(R4)) %*% r4
+  #   #   r = c(rG1, rG2, rG3, rLB, rWA3, rA3, rB3)
+  #   r = c(rG2, rG3, rLB, rWA3, rA3, rB3)
+  #   #   R = cbind(RG1, RG2, RG3, RLB, RWA3, RA3, RB3)
+  #   R = cbind(RG2, RG3, RLB, RWA3, RA3, RB3)
+  #   waldallG = wald(r, R, VAR)
   
-  # Joint a1 = b1 = 0 Test
-  j1 = rbind(r1, r3)
-  J1 = rbind(R1, R3)
-  joint1 = t(j1) %*% qr.solve(J1 %*% VAR %*% t(J1)) %*% j1 #*(nrow(Z)/2)
-  
-  # Joint a2 = b2 = 0 Test
-  j2 = rbind(r2, r4)
-  J2 = rbind(R2, R4)
-  joint2 = t(j2) %*% qr.solve(J2 %*% VAR %*% t(J2)) %*% j2 #*(nrow(Z)/2)
-
-  waldtests <- list(alpha1 = wald1, alpha2 =  wald2,
-                    beta1 =  wald3, beta2 = wald4,
-                    a1b1 = joint1, a2b2 = joint2)
+  # INPUT THE ACTUAL LIST OF VALUES
+  waldtests <- rbind(waldalpha1, waldbeta1, waldbb,
+                     waldalpha2, waldbeta2, waldpopemp)
+  colnames(waldtests) <- c("Test Statistic", "P-Value")
+  rownames(waldtests) <- c("waldalpha1", "waldbeta1", "waldbb",
+                           "waldalpha", "waldbeta2", "waldpopemp")
   return(waldtests)
 }
 
@@ -242,7 +242,8 @@ wald3eq <- function(results, VAR){
   rG3       = C3 / LB # gamma_3 = 0
   rWG3      = WC3 / C3# CANT RECALL
   rLB       = LB      # lambda_b = 0
-
+  
+  #Placeholders
   RA1          <- matrix(0, nrow = nrow(results), ncol = length(A1))
   rownames(RA1)<- rownames(results)
   RB1          <- matrix(0, nrow = nrow(results), ncol = length(B1))
@@ -252,7 +253,7 @@ wald3eq <- function(results, VAR){
   
   RA2          <- vector("numeric", length = nrow(results))
   names(RA2)   <- rownames(results)
-  RA2 -> RWA3 -> RA3 -> RWA3 -> RLP -> RB2 -> RWB3 -> RB3 -> RWB3 -> RLE
+  RA2 -> RWA2 -> RA3 -> RWA3 -> RLP -> RB2 -> RWB2 -> RB3 -> RWB3 -> RLE
   RA2 -> RG2 -> RWG2 -> RG3 -> RWG3 -> RLB
   
   # alpha_1 = 0
@@ -384,6 +385,34 @@ wald3eq <- function(results, VAR){
 #                     gammaALL = waldallG
 #                     )
   return(waldtests)
+}
+
+names2eq <- function(results, k = 4){
+  nA1  = "BB1"
+  nA2  = "y2_l1"
+  nWA2 = "Wy2_l1"
+  nA2l = "y21h"
+  nWA2l= "WY21h"
+  nLP  = "y1_l1"
+  nA   = c(nA1, nA2, nWA2, nA2l, nWA2l, nLP)
+  resultsA <- results[nA,]
+  rownames(resultsA) <- c("nA1", "nA2", "nWA2", "nA2l", "nWA2l", "nLP")
+  tableA <- latable(round(resultsA, k))
+  
+  nB1  = "BB2"
+  nB2  = "y1_l2"
+  nWB2 = "Wy1_l2"
+  nB2l = "y12h"
+  nWB2l= "WY12h"
+  nLE  = "y2_l2"
+  nB   = c(nB1, nB2, nWB2, nB2l, nWB2l, nLE)
+  resultsB <- results[nB,]
+  rownames(resultsB) <- c("nB1", "nB2", "nWB2", "nB2l", "nWB2l", "nLE")
+  tableB <- latable(round(resultsB, k))
+  
+  results <- rbind(resultsA, resultsB)
+  output <- list(results = results, tableA = tableA, tableB = tableB)
+  return(output)
 }
 
 names3eq <- function(results, k = 4){

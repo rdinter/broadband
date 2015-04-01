@@ -7,7 +7,7 @@ load("1-data.RData")
 # library(spdep)
 # library(tseries)
 # library(lmtest)
-# library(magic)
+library(magic)
 
 keep <- data$FIPS %in% as.numeric(row.names(W))
 data <- data[keep,]
@@ -108,10 +108,10 @@ Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)
 
 # Equation 1 (Population) -------------------------------------------------
 
-endo1        <- c("WY2", "y2", "WY3", "y3") #endogenous variables
-xnames1      <- c("y1_l", "y2_l", "Wy2_l", "y3_l", "Wy3_l", "ones",
-                  "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
-                  "Scale", "share", "share65")
+endo1        <- c("WY2", "y2") #endogenous variables
+xnames1      <- c("y1_l", "y2_l", "Wy2_l", "BB",
+                  "ones", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
+                  "Scale", "share", "share65", "permitunit")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
                        y = "y1", Ph = Ph, xW = xW, W = W)
@@ -120,74 +120,58 @@ equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
 # Equation 2 (Employment)--------------------------------------------------
 
 
-endo2        <- c("WY1", "y1", "WY3", "y3") #endogenous variables
-xnames2       <- c("y1_l", "Wy1_l", "y2_l", "y3_l", "Wy3_l", "ones",
-                   "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
-                   "UNrate")
+endo2        <- c("WY1", "y1") #endogenous variables
+xnames2       <- c("y1_l", "Wy1_l", "y2_l", "BB",
+                   "ones", "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
+                   "UNrate", "MEDHHINC", "share65")
 
 equation2 <- two.stage(data = est, n = 2, endo = endo2, xnames = xnames2,
                        y = "y2", Ph = Ph, xW = xW, W = W)
 
-
-# Equation 3 (Broadband)--------------------------------------------------
-
-endo3        <- c("WY1", "y1", "WY2", "y2") #endogenous variables
-xnames3      <- c("y1_l", "Wy1_l", "y2_l", "Wy2_l", "y3_l", "ones",
-                  "tpi", "MEDHHINC", "share", "hwy", "wagesA.2008",
-                  "permitunit")
-
-equation3 <- two.stage(data = est, n = 3, endo = endo3, xnames = xnames3,
-                       y = "y3", Ph = Ph, xW = xW, W = W)
-
-
 # FGS3SLS -----------------------------------------------------------------
 
-fgs.results <- fgs3sls.3(equation1$work, equation2$work, equation3$work,
-                         endo1, endo2, endo3,
-                         xnames1, xnames2, xnames3)
+fgs.results <- fgs3sls.2(equation1$work, equation2$work,
+                         endo1, endo2,
+                         xnames1, xnames2)
 
-ols    <- rbind(equation1$ols, equation2$ols, equation3$ols)
+ols    <- rbind(equation1$ols, equation2$ols)
 ols    <- table.results(ols)
-olsVAR <- adiag(adiag(equation1$olsVAR, equation2$olsVAR), equation3$olsVAR)
+olsVAR <- adiag(equation1$olsVAR, equation2$olsVAR)
 
-stage    <- rbind(equation1$stage, equation2$stage, equation3$stage)
+stage    <- rbind(equation1$stage, equation2$stage)
 stage    <- table.results(stage)
-stageVAR <- adiag(adiag(equation1$stageVAR, equation2$stageVAR),
-                  equation3$stageVAR)
+stageVAR <- adiag(equation1$stageVAR, equation2$stageVAR)
 
-sperr  <- rbind(equation1$sperr, equation2$sperr, equation3$sperr)
+sperr  <- rbind(equation1$sperr, equation2$sperr)
 sperr  <- table.results(sperr, df = 1)
 
 rtrue  <- fgs.results$r
 rtrue1 <- rtrue[1:nrow(W)]
 rtrue2 <- rtrue[(nrow(W)+1):(2*nrow(W))]
-rtrue3 <- rtrue[(2*nrow(W)+1):(3*nrow(W))]
 
 m3eq1  <- moran.test(rtrue1, xW, randomisation = F, alternative = "two.sided")
 m3eq2  <- moran.test(rtrue2, xW, randomisation = F, alternative = "two.sided")
-m3eq3  <- moran.test(rtrue3, xW, randomisation = F, alternative = "two.sided")
 
 
 # Wald Tests --------------------------------------------------------------
 
 source("3-wald-tests.R")
 
-waldols     <- wald3eq(ols, olsVAR)
-waldstage   <- wald3eq(stage, stageVAR)
-waldresults <- wald3eq(fgs.results$results, fgs.results$VAR)
+waldols     <- wald2eq(ols, olsVAR)
+waldstage   <- wald2eq(stage, stageVAR)
+waldresults <- wald2eq(fgs.results$results, fgs.results$VAR)
 
 
 # Preliminary Results -----------------------------------------------------
 
-olsresult   <- names3eq(ols)
-stageresult <- names3eq(stage)
-fgsresult   <- names3eq(fgs.results$results)
+olsresult   <- names2eq(ols)
+stageresult <- names2eq(stage)
+fgsresult   <- names2eq(fgs.results$results)
 
 m3eq1
 m3eq2
-m3eq3
 
-dir = "3-reg-3eq"
+dir = "3-reg-2eq"
 if (!file.exists(dir)) dir.create(dir)
 write.csv(specify_decimal(ols, 4), file = paste0(dir,"/ols-raw.csv"))
 write.csv(specify_decimal(olsresult$results, 4), file = paste0(dir,"/ols.csv"))
@@ -209,12 +193,12 @@ write.csv(specify_decimal(waldresults, 4),
 # Table Results
 tableA  <- cbind(olsresult$tableA, stageresult$tableA, fgsresult$tableA)
 tableB  <- cbind(olsresult$tableB, stageresult$tableB, fgsresult$tableB)
-tableC  <- cbind(olsresult$tableC, stageresult$tableC, fgsresult$tableC)
+
 waldtab <- cbind(latable(round(waldols, 4), wald = T),
                  latable(round(waldstage, 4), wald = T),
                  latable(round(waldresults, 4), wald = T))
 
 write.csv(tableA,  file = paste0(dir, "/tableA.csv"))
 write.csv(tableB,  file = paste0(dir, "/tableB.csv"))
-write.csv(tableC,  file = paste0(dir, "/tableC.csv"))
+
 write.csv(waldtab, file = paste0(dir, "/waldtab.csv"))

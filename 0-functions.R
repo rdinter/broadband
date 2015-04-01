@@ -1,5 +1,3 @@
-#Started: 10-17-2014
-#Last Update: 2-25-2015
 #Robert Dinterman, NCSU Economics PhD Student
 
 
@@ -66,8 +64,9 @@ gmproc <- function(r,W, p = 0.7){
 specify_decimal <- function(x, k) format(round(x, k), nsmall=k)
 
 # In 3 Equation -----------------------------------------------------------
-library(sandwich)
+
 ols.results <- function(model) {
+  require(sandwich)
   DELTA <- model$coefficients
   SE   <- sqrt(diag(vcovHC(model)))
   
@@ -210,11 +209,82 @@ fgs3sls.3 <- function(est1, est2, est3,   #Data
   } else {
     bread  <- (solve(t(ZH) %*% ADJ %*% ZH))
     bread  <- (qr(t(ZH) %*% ADJ %*% ZH)$qr)
-    library(MASS)
+    require(MASS)
     bread  <- ginv(t(ZH) %*% ADJ %*% ZH)
     
   }
   
+  
+  meat   <- t(ZH) %*% ADJ %*% diag(diag(crossprod(t(rtrue)))) %*% ADJ %*% ZH
+  VAR    <- bread %*% meat %*% bread
+  
+  VAR    <- (qr.solve(t(ZH) %*% ADJ %*% ZH))
+  SE     <- sqrt(diag(VAR))
+  
+  results<- table.results(cbind(DELTA, SE),
+                          df = length(Y) / 2 - length(DELTA))
+  return(list(results = results,
+              VAR = VAR,
+              r = rtrue
+  ))
+}
+
+fgs3sls.2 <- function(est1, est2,       #Data
+                      endo1, endo2,     #endogenous vars
+                      xnames1, xnames2, #x vars
+                      bread = "yes"
+){
+  # FGS3SLS -----------------------------------------------------------------
+  endo1  <- paste0(endo1, "1")
+  endo2  <- paste0(endo2, "2")
+    
+  xnames1<- paste0(xnames1, "1")
+  xnames2<- paste0(xnames2, "2")
+  
+  endo1h <- paste0(endo1, "h")
+  endo2h <- paste0(endo2, "h")
+  
+  e1e2   <- t(est1$r) %*% est2$r / sqrt((nrow(est1) - ncol(est1))*
+                                          (nrow(est2) - ncol(est2)))
+  e1e1   <- t(est1$r) %*% est1$r / (nrow(est1) - ncol(est1))
+  e2e2   <- t(est2$r) %*% est2$r / (nrow(est2) - ncol(est2))
+  SIGMA  <- matrix(cbind(e1e1, e1e2, e1e2, e2e2), 2)
+  ISIG   <- qr.solve(SIGMA)
+  
+  ADJ    <- kronecker(ISIG,diag(nrow(est1)))
+  
+  #Need to finish final stage of estimation.
+  Z1H   <- as.matrix(est1[, c(endo1h, xnames1)])
+  Z2H   <- as.matrix(est2[, c(endo2h, xnames2)])
+  
+  Z1    <- as.matrix(est1[, c(endo1, xnames1)])
+  Z2    <- as.matrix(est2[, c(endo2, xnames2)])
+  
+  ZH    <- cbind(kronecker(c(1,0), Z1H), kronecker(c(0,1), Z2H))
+  colnames(ZH) <- c(colnames(Z1H), colnames(Z2H))
+  
+  Z     <- cbind(kronecker(c(1,0), Z1), kronecker(c(0,1), Z2))
+  colnames(Z) <- c(colnames(Z1), colnames(Z2))
+  
+  Y      <- c(est1$y11, est2$y22)
+  
+  DELTA  <- (qr.solve(t(ZH) %*% ADJ %*% ZH)) %*% (t(ZH) %*% ADJ %*% Y)
+  
+  rtrue  <- Y - Z %*% DELTA
+  
+  #   resid  <- rtrue^2
+  #   auxil  <- (qr.solve(t(ZH) %*% ADJ %*% Z)) %*% (t(ZH) %*% ADJ %*% resid)
+  #   white  <- regress(resid, cbind(rep(1,length(Y)), Y, Y^2))
+  
+  if (bread == "yes") {
+    bread  <- (qr.solve(t(ZH) %*% ADJ %*% ZH))
+  } else {
+    bread  <- (solve(t(ZH) %*% ADJ %*% ZH))
+    bread  <- (qr(t(ZH) %*% ADJ %*% ZH)$qr)
+    require(MASS)
+    bread  <- ginv(t(ZH) %*% ADJ %*% ZH)
+    
+  }
   
   meat   <- t(ZH) %*% ADJ %*% diag(diag(crossprod(t(rtrue)))) %*% ADJ %*% ZH
   VAR    <- bread %*% meat %*% bread

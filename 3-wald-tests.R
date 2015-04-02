@@ -149,7 +149,7 @@ wald2eq <- function(results, VAR){
                      waldspemp, waldsppop)
   colnames(waldtests) <- c("Test Statistic", "P-Value")
   rownames(waldtests) <- c("waldalpha1", "waldbeta1", "waldbb",
-                           "waldalpha", "waldbeta2", "waldpopemp",
+                           "waldalpha2", "waldbeta2", "waldpopemp",
                            "waldspemp", "waldsppop")
   return(waldtests)
 }

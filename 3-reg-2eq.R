@@ -13,7 +13,7 @@ est  <- data.frame(data$FIPS)
 # Define Variables for Regression -----------------------------------------
 
 #Population
-est$y1   = data$Exmpt_Num.2010 + data$Exmpt_Num.2009 + data$Exmpt_Num.2008
+est$y1   = data$Exmpt_Num.2010 + data$Exmpt_Num.2009 #+ data$Exmpt_Num.2008
 est$y1   = scale(est$y1)
 
 est$WY1  = W %*% est$y1
@@ -107,8 +107,8 @@ Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)
 
 endo1        <- c("WY2", "y2") #endogenous variables
 xnames1      <- c("y1_l", "y2_l", "Wy2_l", "BB",
-                  "ones", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
-                  "Scale", "share", "share65", "permitunit")
+                  "ones", "MEDHOMVAL", "BLACK",# "MEDHHINC", "UNrate", 
+                  "Scale", "share", "share65")#, "permitunit")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
                        y = "y1", Ph = Ph, xW = xW, W = W)

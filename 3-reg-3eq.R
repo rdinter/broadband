@@ -6,9 +6,6 @@
 # Load Data ---------------------------------------------------------------
 
 load("1-data.RData")
-library(spdep)
-library(tseries)
-library(lmtest)
 library(magic)
 
 keep <- data$FIPS %in% as.numeric(row.names(W))
@@ -209,9 +206,27 @@ write.csv(specify_decimal(waldresults, 4),
           file = paste0(dir,"/wald-results.csv"))
 
 # Table Results
+moranA  <- cbind(c(equation1$moran1$estimate[1], equation1$moran1$p.value),
+                 c(equation1$moran2$estimate[1], equation1$moran2$p.value),
+                 c(m3eq1$estimate[1], m3eq1$p.value))
+moranA  <- specify_decimal(moranA, 4)
 tableA  <- cbind(olsresult$tableA, stageresult$tableA, fgsresult$tableA)
+tableA  <- rbind(tableA, moranA)
+
+moranB  <- cbind(c(equation2$moran1$estimate[1], equation2$moran1$p.value),
+                 c(equation2$moran2$estimate[1], equation2$moran2$p.value),
+                 c(m3eq2$estimate[1], m3eq2$p.value))
+moranB  <- specify_decimal(moranB, 4)
 tableB  <- cbind(olsresult$tableB, stageresult$tableB, fgsresult$tableB)
+tableB  <- rbind(tableB, moranB)
+
+moranC  <- cbind(c(equation3$moran1$estimate[1], equation3$moran1$p.value),
+                 c(equation3$moran2$estimate[1], equation3$moran2$p.value),
+                 c(m3eq3$estimate[1], m3eq3$p.value))
+moranC  <- specify_decimal(moranC, 4)
 tableC  <- cbind(olsresult$tableC, stageresult$tableC, fgsresult$tableC)
+tableC  <- rbind(tableC, moranC)
+
 waldtab <- cbind(latable(round(waldols, 4), wald = T),
                  latable(round(waldstage, 4), wald = T),
                  latable(round(waldresults, 4), wald = T))

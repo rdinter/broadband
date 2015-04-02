@@ -104,6 +104,12 @@ wald2eq <- function(results, VAR){
   RA2[nB2l]  = A2 / B2
   RA2[nWB2l] = A2 / WB2
   
+  #phi_E = 0 test
+  RWA2[nA2]   = WA2
+  RWA2[nWA2]  = 1 / A2
+  RWA2[nA2l]  = WA2 * LE
+  RWA2[nWA2l] = LE / A2
+  
   #beta_1 = 0 test
   RB1[nB1]   = 1 / LE
   RB1[nLE]   = B1 / (LE^2)
@@ -119,32 +125,32 @@ wald2eq <- function(results, VAR){
   RB2[nA2l]  = B2 / A2
   RB2[nWA2l] = B2 / WA2
   
+  #phi_P = 0 test
+  RWB2[nB2]   = WB2
+  RWB2[nWB2]  = 1 / B2
+  RWB2[nB2l]  = WB2 * LP
+  RWB2[nWB2l] = LP / B2
+  
   # WALD TESTING
   waldalpha1 = wald(rA1, RA1, VAR)
   waldalpha2 = wald(rA2, RA2, VAR)
-  
-  #   waldalpha  = wald(c(rA1, rA2), cbind(RA1, RA2), VAR)
-  
   waldbeta1  = wald(rB1, RB1, VAR)
   waldbeta2  = wald(rB2, RB2, VAR)
-  
-  #   waldbeta   = wald(c(rB1, rB2), cbind(RB1, RB2), VAR)
   
   waldbb     = wald(c(rA1, rB1), cbind(RA1, RB1), VAR)
   waldpopemp = wald(c(rA2, rB2), cbind(RA2, RB2), VAR)
   
-  #   #   r = c(rG1, rG2, rG3, rLB, rWA3, rA3, rB3)
-  #   r = c(rG2, rG3, rLB, rWA3, rA3, rB3)
-  #   #   R = cbind(RG1, RG2, RG3, RLB, RWA3, RA3, RB3)
-  #   R = cbind(RG2, RG3, RLB, RWA3, RA3, RB3)
-  #   waldallG = wald(r, R, VAR)
+  waldspemp  = wald(rWA2, RWA2, VAR)
+  waldsppop  = wald(rWB2, RWB2, VAR)
   
   # INPUT THE ACTUAL LIST OF VALUES
   waldtests <- rbind(waldalpha1, waldbeta1, waldbb,
-                     waldalpha2, waldbeta2, waldpopemp)
+                     waldalpha2, waldbeta2, waldpopemp,
+                     waldspemp, waldsppop)
   colnames(waldtests) <- c("Test Statistic", "P-Value")
   rownames(waldtests) <- c("waldalpha1", "waldbeta1", "waldbb",
-                           "waldalpha", "waldbeta2", "waldpopemp")
+                           "waldalpha", "waldbeta2", "waldpopemp",
+                           "waldspemp", "waldsppop")
   return(waldtests)
 }
 
@@ -226,21 +232,21 @@ wald3eq <- function(results, VAR){
   # Restrictions
   rA1       = A1 / LP # alpha_1 = 0
   rA2       = A2 / LP # alpha_2 = 0
-  rWA2      = WA2 / A2# CANT RECALL
+  rWA2      = WA2 / A2# phi_ea = 0
   rA3       = A3 / LP # alpha_3 = 0
   rWA3      = WA3 / A3# phi_ba = 0
   rLP       = LP      # lambda_p = 0
   rB1       = B1 / LE # beta_1 = 0
   rB2       = B2 / LE # beta_2 = 0
-  rWB2      = WB2 / B2# CANT RECALL
+  rWB2      = WB2 / B2# phi_pb = 0
   rB3       = B3 / LE # beta_3 = 0
-  rWB3      = WB3 / B3# CANT RECALL
+  rWB3      = WB3 / B3# phi_bb = 0
   rLE       = LE      # lambda_e = 0
-  rG1       = C1 / LB # gamma_1 = 0
-  rG2       = C2 / LB # gamma_2 = 0
-  rWG2      = WC2 / C2# CANT RECALL
-  rG3       = C3 / LB # gamma_3 = 0
-  rWG3      = WC3 / C3# CANT RECALL
+  rC1       = C1 / LB # gamma_1 = 0
+  rC2       = C2 / LB # gamma_2 = 0
+  rWC2      = WC2 / C2# phi_pc = 0
+  rC3       = C3 / LB # gamma_3 = 0
+  rWC3      = WC3 / C3# phi_ec = 0
   rLB       = LB      # lambda_b = 0
   
   #Placeholders
@@ -248,13 +254,13 @@ wald3eq <- function(results, VAR){
   rownames(RA1)<- rownames(results)
   RB1          <- matrix(0, nrow = nrow(results), ncol = length(B1))
   rownames(RB1)<- rownames(results)
-  RG1          <- matrix(0, nrow = nrow(results), ncol = length(C1))
-  rownames(RG1)<- rownames(results)
+  RC1          <- matrix(0, nrow = nrow(results), ncol = length(C1))
+  rownames(RC1)<- rownames(results)
   
   RA2          <- vector("numeric", length = nrow(results))
   names(RA2)   <- rownames(results)
   RA2 -> RWA2 -> RA3 -> RWA3 -> RLP -> RB2 -> RWB2 -> RB3 -> RWB3 -> RLE
-  RA2 -> RG2 -> RWG2 -> RG3 -> RWG3 -> RLB
+  RA2 -> RC2 -> RWC2 -> RC3 -> RWC3 -> RLB
   
   # alpha_1 = 0
   #   RA1[] =
@@ -271,6 +277,12 @@ wald3eq <- function(results, VAR){
   RA2[nC2l]  = A2 / C2
   RA2[nWC2l] = A2 / WC2
   
+  # phi_ea = 0
+  RWA2[nA2]   = - WA2 / (A2^2)
+  RWA2[nWA2]  = 1 / A2
+  RWA2[nA2l]  = - (WA2*LE) / (A2^2)
+  RWA2[nWA2l] = LE / A2
+  
   # alpha_3 = 0
   RA3[nA3]   = 1/LP
   RA3[nWA3]  = A3 / (LP*WA3)
@@ -281,6 +293,12 @@ wald3eq <- function(results, VAR){
   RA3[nWB2l] = A3 / WB2
   RA3[nC2l]  = A3 / C2
   RA3[nWC2l] = A3 / WC2
+  
+  # phi_ba = 0
+  RWA3[nA3]   = - WA3 / (A3^2)
+  RWA3[nWA3]  = 1 / A3
+  RWA3[nA3l]  = - (WA3*LB) / (A3^2)
+  RWA3[nWA3l] = LB / A3
   
   # beta_2 = 0
   RB2[nA2l]  = B2 / A2
@@ -293,6 +311,12 @@ wald3eq <- function(results, VAR){
   RB2[nC3l]  = B2 / C3
   RB2[nWC3l] = B2 / WC3
   
+  # phi_pb = 0
+  RWB2[nB2]   = - WB2 / (B2^2)
+  RWB2[nWB2]  = 1 / B2
+  RWB2[nB2l]  = - (WB2*LP) / (B2^2)
+  RWB2[nWB2l] = LP / B2
+  
   # beta_ 3 = 0
   RB3[nA2l]  = B3 / A2
   RB3[nWA2l] = B3 / WA2
@@ -304,37 +328,53 @@ wald3eq <- function(results, VAR){
   RB3[nC3l]  = B3 / C3
   RB3[nWC3l] = B3 / WC3
   
+  # phi_bb = 0
+  RWB3[nB3]   = - WB3 / (B3^2)
+  RWB3[nWB3]  = 1 / B3
+  RWB3[nB3l]  = - (WB3*LB) / (B3^2)
+  RWB3[nWB3l] = LB / B3
   
   # gamma_1 = 0
-  RG1[nA3l,]  = C1 / A3
-  RG1[nWA3l,] = C1 / WA3
-  RG1[nB3l,]  = C1 / B3
-  RG1[nWB3l,] = C1 / WB3
-  RG1[nC1,]   = 1 / LB
-  RG1[nLB,]   = C1 / (LB^2)
-  
+  RC1[nA3l,]  = C1 / A3
+  RC1[nWA3l,] = C1 / WA3
+  RC1[nB3l,]  = C1 / B3
+  RC1[nWB3l,] = C1 / WB3
+  RC1[nC1,]   = 1 / LB
+  RC1[nLB,]   = C1 / (LB^2)
   
   # gamma_2 = 0
-  RG2[nA3l]  = C2 / A3
-  RG2[nWA3l] = C2 / WA3
-  RG2[nB3l]  = C2 / B3
-  RG2[nWB3l] = C2 / WB3
-  RG2[nC2]   = 1 / LB
-  RG2[nWC2]  = C2 / (LB*WC2)
-  RG2[nC2l]  = LP / LB
-  RG2[nWC2l] = (C2*LP) / (LB*WC3)
-  RG2[nLB]   = C2 / (LB^2)
-
+  RC2[nA3l]  = C2 / A3
+  RC2[nWA3l] = C2 / WA3
+  RC2[nB3l]  = C2 / B3
+  RC2[nWB3l] = C2 / WB3
+  RC2[nC2]   = 1 / LB
+  RC2[nWC2]  = C2 / (LB*WC2)
+  RC2[nC2l]  = LP / LB
+  RC2[nWC2l] = (C2*LP) / (LB*WC3)
+  RC2[nLB]   = C2 / (LB^2)
+  
+  # phi_pc = 0
+  RWC2[nC2]   = - WC2 / (C2^2)
+  RWC2[nWC2]  = 1 / C2
+  RWC2[nC2l]  = - (WC2*LP) / (C2^2)
+  RWC2[nWC2l] = LP / C2
+  
   # gamma_3 = 0
-  RG3[nA3l]  = C3 / A3
-  RG3[nWA3l] = C3 / WA3
-  RG3[nB3l]  = C3 / B3
-  RG3[nWB3l] = C3 / WB3
-  RG3[nC3]   = 1 / LB
-  RG3[nWC3]  = C3 / (LB*WC3)
-  RG3[nC3l]  = LE / LB
-  RG3[nWC3l] = (C3*LE) / (LB*WC3)
-  RG3[nLB]   = C3 / (LB^2)
+  RC3[nA3l]  = C3 / A3
+  RC3[nWA3l] = C3 / WA3
+  RC3[nB3l]  = C3 / B3
+  RC3[nWB3l] = C3 / WB3
+  RC3[nC3]   = 1 / LB
+  RC3[nWC3]  = C3 / (LB*WC3)
+  RC3[nC3l]  = LE / LB
+  RC3[nWC3l] = (C3*LE) / (LB*WC3)
+  RC3[nLB]   = C3 / (LB^2)
+  
+  # phi_ec = 0
+  RWC3[nC3]   = - WC3 / (C3^2)
+  RWC3[nWC3]  = 1 / C3
+  RWC3[nC3l]  = - (WC3*LE) / (C3^2)
+  RWC3[nWC3l] = LE / C3
   
   # lambda_b = 0
   RLB[nA3l]  = 1 / A3
@@ -342,12 +382,6 @@ wald3eq <- function(results, VAR){
   RLB[nB3l]  = 1 / B3
   RLB[nWB3l] = 1 / WB3
   RLB[nLB]   = 1
-  
-  # phi_ba = 0
-  RWA3[nA3]   = - WA3 / (A3^2)
-  RWA3[nA3l]  = 1 / A3
-  RWA3[nWA3l] = - (WA3 * LB) / (A3^2)
-  RWA3[nLP]   = LB / A3
   
   # WALD TESTING
   waldalpha2 = wald(rA2, RA2, VAR)
@@ -358,32 +392,24 @@ wald3eq <- function(results, VAR){
   waldbeta3  = wald(rB3, RB3, VAR)
   waldbeta   = wald(c(rB2, rB3), cbind(RB2, RB3), VAR)
   
-  waldgamma2 = wald(rG2, RG2, VAR)
-  waldgamma3 = wald(rG3, RG3, VAR)
-  waldgamma  = wald(c(rG2, rG3), cbind(RG2, RG3), VAR)
+  waldgamma2 = wald(rC2, RC2, VAR)
+  waldgamma3 = wald(rC3, RC3, VAR)
+  waldgamma  = wald(c(rC2, rC3), cbind(RC2, RC3), VAR)
   
-  #   r = c(rG1, rG2, rG3, rLB, rWA3, rA3, rB3)
-  r = c(rG2, rG3, rLB, rWA3, rA3, rB3)
-  #   R = cbind(RG1, RG2, RG3, RLB, RWA3, RA3, RB3)
-  R = cbind(RG2, RG3, RLB, RWA3, RA3, RB3)
-  waldallG = wald(r, R, VAR)
+  r = c(rC2, rC3, rLB, rWA3, rWB3, rA3, rB3)
+  R = cbind(RC2, RC3, RLB, RWA3, RWB3, RA3, RB3)
+  waldallC = wald(r, R, VAR)
   
   # INPUT THE ACTUAL LIST OF VALUES
   waldtests <- rbind(waldalpha2, waldalpha3, waldalpha,
                      waldbeta2, waldbeta3, waldbeta,
                      waldgamma2, waldgamma3, waldgamma,
-                     waldallG)
+                     waldallC)
   colnames(waldtests) <- c("Test Statistic", "P-Value")
   rownames(waldtests) <- c("waldalpha2", "waldalpha3", "waldalpha",
                            "waldbeta2", "waldbeta3", "waldbeta",
                            "waldgamma2", "waldgamma3", "waldgamma",
-                           "waldallG")
-#   waldtests <- list(alpha2 = waldalpha2, alpha3 =  waldalpha3,
-#                     beta2 =  waldbeta2, beta3 = waldbeta3,
-#                     gamma2 = waldgamma2, gamma3 = waldgamma3,
-#                     alpha = waldalpha, beta = waldbeta, gamma = waldgamma,
-#                     gammaALL = waldallG
-#                     )
+                           "waldallC")
   return(waldtests)
 }
 

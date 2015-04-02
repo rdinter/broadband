@@ -78,6 +78,7 @@ ols.results <- function(model) {
 
 two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   require(lmtest)
+  require(sandwich)
   require(spdep)
   
   if (!is.character(n)) (n <- as.character(n))
@@ -105,16 +106,17 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   
   # moran.test(as.vector(reg1$residuals), xW)
   
-  gmerror <- GMerrorsar(formula, work, xW)
+  gmerror <- GMerrorsar(formula, work, xW, returnHcov = T)
   
   rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
             t(t(reg1$coefficients))
   
   #Check for residual autocorrelation
+  m1eq <-moran.test(rtrue, xW, randomisation = F, alternative = "two.sided")
   print("Residual Autocorrelation #1")
-  print(moran.test(rtrue, xW, randomisation = F, alternative = "two.sided"))
+  print(m1eq)
+  #   print(moran.mc(rtrue, xW, 100, alternative = "two.sided"))
   gm            <- gmproc(rtrue,W)
-  #   sperr         <- c(gm$p, gm$p.s)
   
   #Transform due to spatial error, not needed for instruments
   work[, y]      <- work[, y] - gm$p * W %*% work[, y]
@@ -131,8 +133,9 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   
   rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
             t(t(reg2$coefficients))
+  m2eq  <- moran.test(rtrue, xW, randomisation = F, alternative = "two.sided")
   print("Residual Autocorrelation #2")
-  print(moran.test(rtrue, xW, randomisation = F, alternative = "two.sided"))
+  print(m2eq)
   
   work$r <- rtrue
   gm     <- data.frame(matrix(unlist(gm), nrow = 2),
@@ -141,7 +144,8 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   return(list(work = work,
               ols  = ols, olsVAR = vcovHC(reg1), 
               stage = stage, stageVAR = vcovHC(reg2),
-              sperr = gm
+              sperr = gm, moran1 = m1eq, moran2 = m2eq,
+              GMerror = gmerror
   ))
 }
 

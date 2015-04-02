@@ -400,6 +400,18 @@ wald3eq <- function(results, VAR){
   R = cbind(RC2, RC3, RLB, RWA3, RWB3, RA3, RB3)
   waldallC = wald(r, R, VAR)
   
+  #Spatial
+  waldpea   = wald(rWA2, RWA2, VAR)
+  waldpba   = wald(rWA3, RWA3, VAR)
+  waldppb   = wald(rWB2, RWB2, VAR)
+  waldpbb   = wald(rWB3, RWB3, VAR)
+  waldpcp   = wald(rWC2, RWC2, VAR)
+  waldpce   = wald(rWC3, RWC3, VAR)
+  
+  waldpp    = wald(c(rWB2, rWC2), cbind(RWB2, RWC2), VAR)
+  waldpe    = wald(c(rWA2, rWC3), cbind(RWA2, RWC3), VAR)
+  waldpb    = wald(c(rWA3, rWB3), cbind(RWA3, RWC3), VAR)
+  
   # INPUT THE ACTUAL LIST OF VALUES
   waldtests <- rbind(waldalpha2, waldalpha3, waldalpha,
                      waldbeta2, waldbeta3, waldbeta,
@@ -410,7 +422,16 @@ wald3eq <- function(results, VAR){
                            "waldbeta2", "waldbeta3", "waldbeta",
                            "waldgamma2", "waldgamma3", "waldgamma",
                            "waldallC")
-  return(waldtests)
+  
+  waldspatial <- rbind(waldpea, waldpba, waldppb, waldpbb, waldpcp,
+                       waldpce, waldpp, waldpe, waldpb)
+  colnames(waldspatial) <- c("Test Statistic", "P-Value")
+  rownames(waldspatial) <- c("waldpea", "waldpba", "waldppb", "waldpbb",
+                             "waldpcp",  "waldpce", "waldpp", "waldpe",
+                             "waldpb")
+  wald <- list(waldtests = waldtests,
+               waldspatial = waldspatial)
+  return(wald)
 }
 
 names2eq <- function(results, k = 4){

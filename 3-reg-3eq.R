@@ -190,20 +190,30 @@ dir = "3-reg-3eq"
 if (!file.exists(dir)) dir.create(dir)
 write.csv(specify_decimal(ols, 4), file = paste0(dir,"/ols-raw.csv"))
 write.csv(specify_decimal(olsresult$results, 4), file = paste0(dir,"/ols.csv"))
-write.csv(specify_decimal(waldols, 4), file = paste0(dir,"/wald-ols.csv"))
+write.csv(specify_decimal(waldols$waldtests, 4),
+          file = paste0(dir,"/wald-ols.csv"))
+write.csv(specify_decimal(waldols$waldspatial, 4),
+          file = paste0(dir,"/wald-spatial-ols.csv"))
 
 
 write.csv(specify_decimal(stage, 4), file = paste0(dir,"/stage2-raw.csv"))
 write.csv(specify_decimal(stageresult$results, 4),
           file = paste0(dir,"/stage2.csv"))
-write.csv(specify_decimal(waldstage, 4), file = paste0(dir,"/wald-stage2.csv"))
+write.csv(specify_decimal(waldstage$waldtests, 4),
+          file = paste0(dir,"/wald-stage2.csv"))
+write.csv(specify_decimal(waldstage$waldspatial, 4),
+          file = paste0(dir,"/wald-spatial-stage2.csv"))
+
 
 write.csv(specify_decimal(fgs.results$results, 4),
           file = paste0(dir,"/results-raw.csv"))
 write.csv(specify_decimal(fgsresult$results, 4),
           file = paste0(dir,"/results.csv"))
-write.csv(specify_decimal(waldresults, 4),
+write.csv(specify_decimal(waldresults$waldtests, 4),
           file = paste0(dir,"/wald-results.csv"))
+write.csv(specify_decimal(waldresults$waldspatial, 4),
+          file = paste0(dir,"/wald-spatial-results.csv"))
+
 
 # Table Results
 moranA  <- cbind(c(equation1$moran1$estimate[1], equation1$moran1$p.value),
@@ -227,11 +237,16 @@ moranC  <- specify_decimal(moranC, 4)
 tableC  <- cbind(olsresult$tableC, stageresult$tableC, fgsresult$tableC)
 tableC  <- rbind(tableC, moranC)
 
-waldtab <- cbind(latable(round(waldols, 4), wald = T),
-                 latable(round(waldstage, 4), wald = T),
-                 latable(round(waldresults, 4), wald = T))
+waldtab <- cbind(latable(round(waldols$waldtests, 4), wald = T),
+                 latable(round(waldstage$waldtests, 4), wald = T),
+                 latable(round(waldresults$waldtests, 4), wald = T))
+
+waldtabsp <- cbind(latable(round(waldols$waldspatial, 4), wald = T),
+                     latable(round(waldstage$waldspatial, 4), wald = T),
+                     latable(round(waldresults$waldspatial, 4), wald = T))
 
 write.csv(tableA,  file = paste0(dir, "/tableA.csv"))
 write.csv(tableB,  file = paste0(dir, "/tableB.csv"))
 write.csv(tableC,  file = paste0(dir, "/tableC.csv"))
 write.csv(waldtab, file = paste0(dir, "/waldtab.csv"))
+write.csv(waldtabsp, file = paste0(dir, "/waldtab-spatial.csv"))

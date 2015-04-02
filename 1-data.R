@@ -23,7 +23,7 @@ data <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
 load("0-data/QCEW/QCEWAnnual_2.RData") #employment, called annual
 # qcew <- read_csv("0-data/QCEW/QCEW_.csv")
-temp <- subset(annual, year >= 2000 & own_code == 0)
+temp <- subset(annual, year >= 2006 & own_code == 0)
 vars <- c("year", "FIPS", "annual_avg_estabs_count", "annual_avg_emplvl",
           "total_annual_wages", "taxable_annual_wages", "annual_contributions",
           "annual_avg_wkly_wage", "avg_annual_pay")
@@ -33,17 +33,24 @@ names(temp) <- c("year", "FIPS", "establishmentsA", "employA", "wagesA",
                  "taxwageA", "contrA", "avgwageA", "avgpayA")
 temp <- reshape(temp, idvar = "FIPS", timevar = "year", direction = "wide")
 
-# #NAICS Classifications
-# annual[is.na(annual)] <- -1
-# qcew       <-subset(annual, ownership == 5) #Only Private
-# qcew$NAICS <- gsub("\\s","", qcew$NAICS)
-# qcew$NAICS <- factor(qcew$NAICS)
-# qcew       <- qcew[,c("FIPS", "year", "NAICS",
-#                       "employA", "establishmentsA", "wagesA")]
-# NAICS      <- reshape(qcew, idvar = c("FIPS","year"), timevar = "NAICS",
-#                 v.names = c("employA", "establishmentsA", "wagesA"),
-#                 direction = "wide")
-rm(annual)
+#NAICS Classifications
+annual[is.na(annual)] <- -1
+qcew       <-subset(annual, year >= 2006 & own_code == 5) #Only Private
+qcew$NAICS <- gsub("\\s","", qcew$industry_code)
+qcew$NAICS <- gsub("-", ".", qcew$NAICS)
+qcew$NAICS <- factor(qcew$NAICS)
+qcew       <- qcew[,c("FIPS", "year", "NAICS",
+                      "annual_avg_estabs_count", "annual_avg_emplvl",
+                      "total_annual_wages")]
+names(qcew)<- c("FIPS", "year", "NAICS", "establishmentsA", "employA", "wagesA")
+qcew       <- reshape(qcew, idvar = c("FIPS", "year"), timevar = "NAICS",
+                      v.names = c("establishmentsA", "employA", "wagesA"),
+                      direction = "wide")
+qcew       <- reshape(qcew, idvar = "FIPS", timevar = "year",
+                      direction = "wide")
+qcew[is.na(qcew)] <- 0
+temp       <- merge(temp, qcew, by = "FIPS")
+rm(annual, qcew)
 
 ### Change FIPS with 999 at end to 000
 temp$fips <- as.character(temp$FIPS)
@@ -58,14 +65,6 @@ check <- data$FIPS %in% temp$FIPS
 data$FIPS[!check] #missing territories and 15005 in BB data
 
 data <- merge(data, temp, by = "FIPS", all.y = T)
-
-#Break down QCEW by NAICS... needs work
-# temp <- subset(annual, year >= 2007 & ownership != 0)
-# temp <- temp[,c("year", "FIPS", "NAICS", "establishmentsA", "employA", "wagesA",
-#                 "taxwageA", "contrA", "avgwageA", "avgpayA")]
-# atemp <- reshape(temp, idvar = "FIPS", timevar = "year", v.names = "NAICS",
-#                  direction = "wide")
-# rm(annual)
 
 
 tempi <- read_csv("0-data/IRS/inflows0410.csv") #migration

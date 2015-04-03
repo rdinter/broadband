@@ -1,12 +1,8 @@
 #Robert Dinterman, NCSU Economics PhD Student
 
-#bptest()
-#jarque.bera.test()
-
 # Load Data ---------------------------------------------------------------
 
 load("1-data.RData")
-library(magic)
 
 keep <- data$FIPS %in% as.numeric(row.names(W))
 data <- data[keep,]

@@ -98,7 +98,7 @@ sperr <- data.frame()
 
 # Instrument Matrix -------------------------------------------------------
 
-H   <- as.matrix(est[, vars])
+H   <- as.matrix(est[, vars[-1]])
 WH  <- W %*% H
 WWH <- W %*% WH
 Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)

@@ -85,7 +85,8 @@ est[is.na(est)] <- 0
 est$ones        <- 1
 vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
                      "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
-                     "taxwageA.2008", "permitunit", "share65")
+                     "taxwageA.2008", "permitunit", "share65", "rurala",
+                     "ruraln")
 est[, vars]     <- scale(est[, vars])
 
 # Estimation Procedures ---------------------------------------------------
@@ -106,10 +107,11 @@ Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)
 
 # Equation 1 (Population) -------------------------------------------------
 
-endo1        <- c("WY2", "y2") #endogenous variables
-xnames1      <- c("y1_l", "y2_l", "Wy2_l", "BB",
+endo1        <- c("WY2", "y2", "BB") #endogenous variables
+xnames1      <- c("y1_l", "y2_l", "Wy2_l",# "BB",
                   "ones", "MEDHOMVAL", "BLACK",# "MEDHHINC", "UNrate", 
-                  "Scale", "share", "share65")#, "permitunit")
+                  "Scale", "share", "share65", "rurala",
+                  "ruraln")#, "permitunit")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
                        y = "y1", Ph = Ph, xW = xW, W = W)
@@ -118,10 +120,10 @@ equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
 # Equation 2 (Employment)--------------------------------------------------
 
 
-endo2        <- c("WY1", "y1") #endogenous variables
-xnames2       <- c("y1_l", "Wy1_l", "y2_l", "BB",
+endo2        <- c("WY1", "y1", "BB") #endogenous variables
+xnames2       <- c("y1_l", "Wy1_l", "y2_l",# "BB",
                    "ones", "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
-                   "UNrate", "MEDHHINC", "share65")
+                   "UNrate", "MEDHHINC", "share65", "rurala", "ruraln")
 
 equation2 <- two.stage(data = est, n = 2, endo = endo2, xnames = xnames2,
                        y = "y2", Ph = Ph, xW = xW, W = W)

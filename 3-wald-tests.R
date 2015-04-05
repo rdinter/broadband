@@ -46,14 +46,14 @@ wald <- function(r, R, VAR){
 
 wald2eq <- function(results, VAR){
   
-  nA1  = "BB1"
+  nA1  = "BB1h"
   nA2  = "y2_l1"
   nWA2 = "Wy2_l1"
   nA2l = "y21h"
   nWA2l= "WY21h"
   nLP  = "y1_l1"
   
-  nB1  = "BB2"
+  nB1  = "BB2h"
   nB2  = "y1_l2"
   nWB2 = "Wy1_l2"
   nB2l = "y12h"
@@ -435,7 +435,7 @@ wald3eq <- function(results, VAR){
 }
 
 names2eq <- function(results, k = 4){
-  nA1  = "BB1"
+  nA1  = "BB1h"
   nA2  = "y2_l1"
   nWA2 = "Wy2_l1"
   nA2l = "y21h"
@@ -446,7 +446,7 @@ names2eq <- function(results, k = 4){
   rownames(resultsA) <- c("nA1", "nA2", "nWA2", "nA2l", "nWA2l", "nLP")
   tableA <- latable(round(resultsA, k))
   
-  nB1  = "BB2"
+  nB1  = "BB2h"
   nB2  = "y1_l2"
   nWB2 = "Wy1_l2"
   nB2l = "y12h"

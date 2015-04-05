@@ -57,6 +57,8 @@ est$metro  = factor(data$ruc)
 levels(est$metro) = c("metro", "metro", "metro",
                       "rural-adjacent", "rural-nonadjacent", "rural-adjacent",
                       "rural-nonadjacent","rural-adjacent","rural-nonadjacent")
+est$rurala <- est$metro == "rural-adjacent"
+est$ruraln <- est$metro == "rural-nonadjacent"
 
 #Highway
 est$hwy    = data$HWYSUM / data$HWYAREA
@@ -82,7 +84,8 @@ est[is.na(est)] <- 0
 est$ones        <- 1
 vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
                      "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
-                     "taxwageA.2008", "permitunit", "share65")
+                     "taxwageA.2008", "permitunit", "share65", "rurala",
+                     "ruraln")
 est[, vars]     <- scale(est[, vars])
 
 # Estimation Procedures ---------------------------------------------------
@@ -106,7 +109,7 @@ Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)
 endo1        <- c("WY2", "y2", "WY3", "y3") #endogenous variables
 xnames1      <- c("y1_l", "y2_l", "Wy2_l", "y3_l", "Wy3_l", "ones",
                   "MEDHOMVAL", "BLACK", # "UNrate", "MEDHHINC",
-                  "Scale", "share", "share65")
+                  "Scale", "share", "share65", "rurala", "ruraln")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
                        y = "y1", Ph = Ph, xW = xW, W = W)
@@ -118,7 +121,7 @@ equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
 endo2        <- c("WY1", "y1", "WY3", "y3") #endogenous variables
 xnames2       <- c("y1_l", "Wy1_l", "y2_l", "y3_l", "Wy3_l", "ones",
                   "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
-                  "UNrate")
+                  "UNrate", "rurala", "ruraln")
 
 equation2 <- two.stage(data = est, n = 2, endo = endo2, xnames = xnames2,
                        y = "y2", Ph = Ph, xW = xW, W = W)
@@ -129,7 +132,7 @@ equation2 <- two.stage(data = est, n = 2, endo = endo2, xnames = xnames2,
 endo3        <- c("WY1", "y1", "WY2", "y2") #endogenous variables
 xnames3      <- c("y1_l", "Wy1_l", "y2_l", "Wy2_l", "y3_l", "ones",
                   "tpi", "MEDHHINC", "share", "hwy", "wagesA.2008",
-                  "permitunit")
+                  "permitunit", "rurala", "ruraln")
 
 equation3 <- two.stage(data = est, n = 3, endo = endo3, xnames = xnames3,
                        y = "y3", Ph = Ph, xW = xW, W = W)

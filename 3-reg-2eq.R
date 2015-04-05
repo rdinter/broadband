@@ -58,6 +58,8 @@ est$metro  = factor(data$ruc)
 levels(est$metro) = c("metro", "metro", "metro",
                       "rural-adjacent", "rural-nonadjacent", "rural-adjacent",
                       "rural-nonadjacent","rural-adjacent","rural-nonadjacent")
+est$rurala <- est$metro == "rural-adjacent"
+est$ruraln <- est$metro == "rural-nonadjacent"
 
 #Highway
 est$hwy    = data$HWYSUM / data$HWYAREA

@@ -72,8 +72,8 @@ est$wagesA.2008 = data$wagesA.2008 / data$employA.2008
 est$taxwageA.2008 = data$taxwageA.2008 / data$employA.2008
 
 #
-est$MEDHOMVAL   <- data$MEDHOMVAL
-est$MEDHHINC    <- data$MEDHHINC
+est$MEDHOMVAL   <- log(data$MEDHOMVAL)
+est$MEDHHINC    <- log(data$MEDHHINC)
 est$BLACK       <- data$BLACK
 est$Scale       <- data$Scale
 est$share       <- data$share
@@ -81,12 +81,14 @@ est$tpi         <- data$tpi
 est$EDUC        <- data$EDUC
 est$permitunit  <- data$permitunit
 est$share65     <- data$Over64_2000_per
+est$poverty     <- data$Poverty.Percent.Ages.5.17
+est$area        <- log(data$AREA)
 est[is.na(est)] <- 0
 est$ones        <- 1
 vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
                      "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
                      "taxwageA.2008", "permitunit", "share65", "rurala",
-                     "ruraln")
+                     "ruraln", "poverty", "area")
 est[, vars]     <- scale(est[, vars])
 
 # Estimation Procedures ---------------------------------------------------
@@ -111,7 +113,7 @@ endo1        <- c("WY2", "y2", "BB") #endogenous variables
 xnames1      <- c("y1_l", "y2_l", "Wy2_l",# "BB",
                   "ones", "MEDHOMVAL", "BLACK",# "MEDHHINC", "UNrate", 
                   "Scale", "share", "share65", "rurala",
-                  "ruraln")#, "permitunit")
+                  "ruraln", "poverty")#, "area")#, "permitunit")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
                        y = "y1", Ph = Ph, xW = xW, W = W)
@@ -123,7 +125,7 @@ equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
 endo2        <- c("WY1", "y1", "BB") #endogenous variables
 xnames2       <- c("y1_l", "Wy1_l", "y2_l",# "BB",
                    "ones", "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
-                   "UNrate", "MEDHHINC", "share65", "rurala", "ruraln")
+                   "UNrate", "MEDHHINC", "share65", "rurala", "ruraln")#, "area")
 
 equation2 <- two.stage(data = est, n = 2, endo = endo2, xnames = xnames2,
                        y = "y2", Ph = Ph, xW = xW, W = W)

@@ -40,6 +40,7 @@ est$Wy2_l= W %*% est$y2_l
 est$dBB   = data$total_prov.2010B - data$total_prov.2008B
 est$BB    = data$total_prov.2008B
 
+est$y3    = est$dBB
 est$y3    = scale(est$dBB)
 est$WY3   = W %*% est$y3
 
@@ -70,9 +71,10 @@ est$hwy    = data$HWYSUM / data$HWYAREA
 est$wagesA.2008 = data$wagesA.2008 / data$employA.2008
 est$taxwageA.2008 = data$taxwageA.2008 / data$employA.2008
 
+
 #
-est$MEDHOMVAL   <- data$MEDHOMVAL
-est$MEDHHINC    <- data$MEDHHINC
+est$MEDHOMVAL   <- log(data$MEDHOMVAL)
+est$MEDHHINC    <- log(data$MEDHHINC)
 est$BLACK       <- data$BLACK
 est$Scale       <- data$Scale
 est$share       <- data$share
@@ -80,12 +82,14 @@ est$tpi         <- data$tpi
 est$EDUC        <- data$EDUC
 est$permitunit  <- data$permitunit
 est$share65     <- data$Over64_2000_per
+est$poverty     <- data$Poverty.Percent.Ages.5.17
+est$area        <- log(data$AREA)
 est[is.na(est)] <- 0
 est$ones        <- 1
 vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
                      "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
                      "taxwageA.2008", "permitunit", "share65", "rurala",
-                     "ruraln")
+                     "ruraln", "poverty", "area")
 est[, vars]     <- scale(est[, vars])
 
 # Estimation Procedures ---------------------------------------------------

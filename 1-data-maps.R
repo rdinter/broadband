@@ -24,8 +24,7 @@ bottom         <- quantile(data$migration, 0.1)
 data$migration[data$migration > top]    <- top
 data$migration[data$migration < bottom] <- bottom
 
-data$migrationchange <- data$Exmpt_Num.2008 + data$Exmpt_Num.2009 +
-  data$Exmpt_Num.2010
+data$migrationchange <- data$Exmpt_Num.2009 +  data$Exmpt_Num.2010
 top            <- quantile(data$migrationchange, 0.9)
 bottom         <- quantile(data$migrationchange, 0.1)
 data$migrationchange[data$migrationchange > top]    <- top

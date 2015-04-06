@@ -194,7 +194,7 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
 fgs3sls.3 <- function(est1, est2, est3,   #Data
                       endo1, endo2, endo3, #endogenous vars
                       xnames1, xnames2, xnames3, #x vars
-                      bread = "yes"
+                      robust = F
 ){
   # FGS3SLS -----------------------------------------------------------------
   endo1  <- paste0(endo1, "1")
@@ -252,21 +252,19 @@ fgs3sls.3 <- function(est1, est2, est3,   #Data
   #   auxil  <- (qr.solve(t(ZH) %*% ADJ %*% Z)) %*% (t(ZH) %*% ADJ %*% resid)
   #   white  <- regress(resid, cbind(rep(1,length(Y)), Y, Y^2))
   
-  if (bread == "yes") {
-    bread  <- (qr.solve(t(ZH) %*% ADJ %*% ZH))
+  bread  <- tryCatch(qr.solve(t(ZH) %*% ADJ %*% ZH),
+                     error = function(e){
+                       require(MASS)
+                       ginv(t(ZH) %*% ADJ %*% ZH)
+                     })
+  
+  if (robust) {
+    meat   <- t(ZH) %*% ADJ %*% diag(diag(crossprod(t(rtrue)))) %*% ADJ %*% ZH
+    VAR    <- bread %*% meat %*% bread
   } else {
-    bread  <- (solve(t(ZH) %*% ADJ %*% ZH))
-    bread  <- (qr(t(ZH) %*% ADJ %*% ZH)$qr)
-    require(MASS)
-    bread  <- ginv(t(ZH) %*% ADJ %*% ZH)
-    
+    VAR    <- bread
   }
   
-  
-  meat   <- t(ZH) %*% ADJ %*% diag(diag(crossprod(t(rtrue)))) %*% ADJ %*% ZH
-  VAR    <- bread %*% meat %*% bread
-  
-  VAR    <- (qr.solve(t(ZH) %*% ADJ %*% ZH))
   SE     <- sqrt(diag(VAR))
   
   results<- table.results(cbind(DELTA, SE),
@@ -280,7 +278,7 @@ fgs3sls.3 <- function(est1, est2, est3,   #Data
 fgs3sls.2 <- function(est1, est2,       #Data
                       endo1, endo2,     #endogenous vars
                       xnames1, xnames2, #x vars
-                      bread = "yes"
+                      robust = F
 ){
   # FGS3SLS -----------------------------------------------------------------
   endo1  <- paste0(endo1, "1")
@@ -324,20 +322,19 @@ fgs3sls.2 <- function(est1, est2,       #Data
   #   auxil  <- (qr.solve(t(ZH) %*% ADJ %*% Z)) %*% (t(ZH) %*% ADJ %*% resid)
   #   white  <- regress(resid, cbind(rep(1,length(Y)), Y, Y^2))
   
-  if (bread == "yes") {
-    bread  <- (qr.solve(t(ZH) %*% ADJ %*% ZH))
+  bread  <- tryCatch(qr.solve(t(ZH) %*% ADJ %*% ZH),
+                     error = function(e){
+                       require(MASS)
+                       ginv(t(ZH) %*% ADJ %*% ZH)
+                     })
+  
+  if (robust) {
+    meat   <- t(ZH) %*% ADJ %*% diag(diag(crossprod(t(rtrue)))) %*% ADJ %*% ZH
+    VAR    <- bread %*% meat %*% bread
   } else {
-    bread  <- (solve(t(ZH) %*% ADJ %*% ZH))
-    bread  <- (qr(t(ZH) %*% ADJ %*% ZH)$qr)
-    require(MASS)
-    bread  <- ginv(t(ZH) %*% ADJ %*% ZH)
-    
+    VAR    <- bread
   }
   
-  meat   <- t(ZH) %*% ADJ %*% diag(diag(crossprod(t(rtrue)))) %*% ADJ %*% ZH
-  VAR    <- bread %*% meat %*% bread
-  
-  VAR    <- (qr.solve(t(ZH) %*% ADJ %*% ZH))
   SE     <- sqrt(diag(VAR))
   
   results<- table.results(cbind(DELTA, SE),

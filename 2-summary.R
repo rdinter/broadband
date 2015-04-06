@@ -19,17 +19,19 @@ est$metro  = factor(data$ruc)
 levels(est$metro) = c("metro", "metro", "metro",
                       "rural-adjacent", "rural-nonadjacent", "rural-adjacent",
                       "rural-nonadjacent","rural-adjacent","rural-nonadjacent")
+est$rurala <- est$metro == "rural-adjacent"
+est$ruraln <- est$metro == "rural-nonadjacent"
 
 #Highway
 est$hwy    = data$HWYSUM / data$HWYAREA
 
 #Per Capita Wages
-# est$wagesA.2008 = data$wagesA.2008 / data$Emp.2008
+# est$wagesA.2008   = data$wagesA.2008 / data$Emp.2008
 # est$taxwageA.2008 = data$taxwageA.2008 / data$Emp.2008
-est$wagesA.2008 = data$wagesA.2008 / data$employA.2008
+est$wagesA.2008   = data$wagesA.2008 / data$employA.2008
 est$taxwageA.2008 = data$taxwageA.2008 / data$employA.2008
 
-
+#
 est$MEDHOMVAL   <- data$MEDHOMVAL
 est$MEDHHINC    <- data$MEDHHINC
 est$BLACK       <- data$BLACK
@@ -39,57 +41,27 @@ est$tpi         <- data$tpi
 est$EDUC        <- data$EDUC
 est$permitunit  <- data$permitunit
 est$share65     <- data$Over64_2000_per
+est$poverty     <- data$Poverty.Percent.Ages.5.17
+est$area        <- log(data$AREA)
 est[is.na(est)] <- 0
 est$ones        <- 1
-vars            <- c("MEDHHINC", "MEDHOMVAL", "wagesA.2008",
-                     "taxwageA.2008", "UNrate", "BLACK", "Scale",
-                     "share", "tpi", "hwy", "EDUC", "permitunit",
-                     "share65")
+vars            <- c("UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
+                     "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
+                     "taxwageA.2008", "permitunit", "share65", "rurala",
+                     "ruraln", "poverty", "area")
 
-tab <- cbind(sapply(est[,vars], mean), sapply(est[,vars], sd))
-xtable(tab, digits = -4)
+tab1 <- cbind(sapply(est[,vars], mean), sapply(est[,vars], sd))
+xtable(tab1, digits = -4)
 
 # Summary Statistics ------------------------------------------------------
-load("1-data.RData")
-library(spdep)
 
-keep <- data$FIPS %in% as.numeric(row.names(W))
-data <- data[keep,]
+vars08 <- c("total_prov.2008B", "employA.2008", "establishmentsA.2008",
+            "POPESTIMATE2008")
+vars10 <- c("total_prov.2010B", "employA.2010", "establishmentsA.2010",
+            "POPESTIMATE2010")
 
-mean(data$total_prov.2008B)
-sd(data$total_prov.2008B)
-mean(data$total_prov.2010B)
-sd(data$total_prov.2010B)
-mean(data$total_prov.2012B)
-sd(data$total_prov.2012B)
-
-mean(data$rfc_per_1000_hhs_btop.2008B)*20
-sd(data$rfc_per_1000_hhs_btop.2008B)*20
-mean(data$rfc_per_1000_hhs_btop.2010B)*20
-sd(data$rfc_per_1000_hhs_btop.2010B)*20
-mean(data$rfc_per_1000_hhs_btop.2012B)*20
-sd(data$rfc_per_1000_hhs_btop.2012B)*20
-
-mean(data$employA.2008)
-sd(data$employA.2008)
-mean(data$employA.2010)
-sd(data$employA.2010)
-mean(data$employA.2012)
-sd(data$employA.2012)
-
-mean(data$establishmentsA.2008)
-sd(data$establishmentsA.2008)
-mean(data$establishmentsA.2010)
-sd(data$establishmentsA.2010)
-mean(data$establishmentsA.2012)
-sd(data$establishmentsA.2012)
-
-mean(data$POPESTIMATE2008)
-sd(data$POPESTIMATE2008)
-mean(data$POPESTIMATE2010)
-sd(data$POPESTIMATE2010)
-mean(data$POPESTIMATE2012)
-sd(data$POPESTIMATE2012)
-
-summary(data$Exmpt_Num.2008)
-summary(data$Exmpt_Num.2010)
+tab2 <- cbind(sapply(data[,vars08], mean), sapply(data[,vars08], sd), 
+              sapply(data[,vars10], mean), sapply(data[,vars10], sd),
+              sapply(data[,vars10]- data[,vars08], mean),
+              sapply(data[,vars10]- data[,vars08], sd))
+xtable(tab2)

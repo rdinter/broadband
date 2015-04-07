@@ -7,89 +7,14 @@ load("1-data.RData")
 
 keep <- data$FIPS %in% as.numeric(row.names(W))
 data <- data[keep,]
-est  <- data.frame(data$FIPS)
 
 # Define Variables for Regression -----------------------------------------
-
-#Population
-est$y1   = data$Exmpt_Num.2010 + data$Exmpt_Num.2009 #+ data$Exmpt_Num.2008
-est$y1   = scale(est$y1)
-
-est$WY1  = W %*% est$y1
-#est$WY1  = scale(est$WY1)
-
-est$Wy1  = est$y1 + est$WY1
-
-est$y1_l = scale(data$POPESTIMATE2008)
-# est$y1_l = est$y1_l + W %*% est$y1_l
-est$Wy1_l = W %*% est$y1_l
-
-#Employment
-est$y2   = data$employA.2010 - data$employA.2008
-est$y2   = scale(est$y2)
-
-est$WY2  = W %*% est$y2
-#est$WY2  = scale(est$WY2)
-
-est$Wy2  = est$y2 + est$WY2
-
-est$y2_l = scale(data$employA.2008)
-# est$y2_l = est$y2_l + W %*% est$y2_l
-est$Wy2_l= W %*% est$y2_l
-
-#Broadband
-est$dBB   = data$total_prov.2010B - data$total_prov.2008B
-est$BB    = data$total_prov.2008B
-
-est$y3    = scale(est$dBB)
-est$WY3   = W %*% est$y3
-
-est$Wy3   = est$y3 + est$WY3
-
-est$y3_l  = scale(data$total_prov.2008B)
-# est$y3_l  = est$y3_l + W %*% est$y3_l
-est$Wy3_l = W %*% est$y3_l
-
-#Unemployment Rate
-est$UNrate = data$Unemp.2008 / (data$Unemp.2008 + data$Emp.2008)
-
-#Metro
-est$metro  = factor(data$ruc)
-levels(est$metro) = c("metro", "metro", "metro",
-                      "rural-adjacent", "rural-nonadjacent", "rural-adjacent",
-                      "rural-nonadjacent","rural-adjacent","rural-nonadjacent")
-est$rurala <- est$metro == "rural-adjacent"
-est$ruraln <- est$metro == "rural-nonadjacent"
-
-#Highway
-est$hwy    = data$HWYSUM / data$HWYAREA
-
-
-#Per Capita Wages
-# est$wagesA.2008 = data$wagesA.2008 / data$Emp.2008
-# est$taxwageA.2008 = data$taxwageA.2008 / data$Emp.2008
-est$wagesA.2008 = data$wagesA.2008 / data$employA.2008
-est$taxwageA.2008 = data$taxwageA.2008 / data$employA.2008
-
-#
-est$MEDHOMVAL   <- log(data$MEDHOMVAL)
-est$MEDHHINC    <- log(data$MEDHHINC)
-est$BLACK       <- data$BLACK
-est$Scale       <- data$Scale
-est$share       <- data$share
-est$tpi         <- data$tpi
-est$EDUC        <- data$EDUC
-est$permitunit  <- data$permitunit
-est$share65     <- data$Over64_2000_per
-est$poverty     <- data$Poverty.Percent.Ages.5.17
-est$area        <- log(data$AREA)
-est[is.na(est)] <- 0
-est$ones        <- 1
-vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
-                     "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
-                     "taxwageA.2008", "permitunit", "share65", "rurala",
-                     "ruraln", "poverty", "area")
-est[, vars]     <- scale(est[, vars])
+source("2-data-set.R")
+est  <- setvars(y1.1 = "Exmpt_Num.2009", y1.2 = "Exmpt_Num.2010",
+                y1.l = "POPESTIMATE2008", y2.1 = "employA.2008",
+                y2.2 = "employA.2010", y3.1 = "total_prov.2008B",
+                y3.2 = NULL,
+                scal = T, data = data, W = W)
 
 # Estimation Procedures ---------------------------------------------------
 
@@ -98,14 +23,6 @@ source("0-functions.R")
 ols   <- data.frame()
 stage <- data.frame()
 sperr <- data.frame()
-
-# Instrument Matrix -------------------------------------------------------
-
-H   <- as.matrix(est[, vars[-1]])
-WH  <- W %*% H
-WWH <- W %*% WH
-Ph  <- cbind(rep(1, nrow(W)), H, WH, WWH)
-# Prj <- Ph %*% solve(t(Ph) %*% Ph) %*% t(Ph)
 
 # Equation 1 (Population) -------------------------------------------------
 
@@ -116,19 +33,19 @@ xnames1      <- c("y1_l", "y2_l", "Wy2_l",# "BB",
                   "ruraln", "poverty")#, "area")#, "permitunit")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,
-                       y = "y1", Ph = Ph, xW = xW, W = W)
+                       y = "y1", Ph = est$Ph, xW = xW, W = W)
 
 
 # Equation 2 (Employment)--------------------------------------------------
 
 
 endo2        <- c("WY1", "y1", "BB") #endogenous variables
-xnames2       <- c("y1_l", "Wy1_l", "y2_l",# "BB",
-                   "ones", "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
-                   "UNrate", "MEDHHINC", "share65", "rurala", "ruraln")#, "area")
+xnames2      <- c("y1_l", "Wy1_l", "y2_l",# "BB",
+                  "ones", "hwy", "EDUC", "wagesA.2008", "taxwageA.2008",
+                  "UNrate", "MEDHHINC", "share65", "rurala", "ruraln")#,"area")
 
 equation2 <- two.stage(data = est, n = 2, endo = endo2, xnames = xnames2,
-                       y = "y2", Ph = Ph, xW = xW, W = W)
+                       y = "y2", Ph = est$Ph, xW = xW, W = W)
 
 # FGS3SLS -----------------------------------------------------------------
 

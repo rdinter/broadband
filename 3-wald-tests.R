@@ -44,6 +44,23 @@ wald <- function(r, R, VAR){
   return(cbind(stat, pval))
 }
 
+delta <- function(r, R, VAR){
+  if (!is.vector(r)) r <- as.vector(r)
+  R  <- t(R)
+  
+  var  <- R %*% VAR %*% t(R)
+  se   <- sqrt(var)
+  pval <- 1 - pt(se, 1)
+  
+  beta <- paste0(r)
+  if (pval < 0.1) beta <- paste0(beta, "*")
+  if (pval < 0.05) beta <- paste0(beta, "*")
+  if (pval < 0.01) beta <- paste0(beta, "*")
+  
+  return(cbind(beta, se, pval))
+}
+
+
 wald2eq <- function(results, VAR){
   
   nA1  = "BB1h"
@@ -512,4 +529,111 @@ names3eq <- function(results, k = 4){
   output <- list(results = results, tableA = tableA,
                  tableB = tableB, tableC = tableC)
   return(output)
+}
+
+se2eq <- function(results, VAR){
+  
+  nA1  = "BB1h"
+  nA2  = "y2_l1"
+  nWA2 = "Wy2_l1"
+  nA2l = "y21h"
+  nWA2l= "WY21h"
+  nLP  = "y1_l1"
+  
+  nB1  = "BB2h"
+  nB2  = "y1_l2"
+  nWB2 = "Wy1_l2"
+  nB2l = "y12h"
+  nWB2l= "WY12h"
+  nLE  = "y2_l2"
+  
+  A1   = results[nA1, "DELTA"]
+  A2   = results[nA2, "DELTA"]
+  WA2  = results[nWA2, "DELTA"]
+  A2l  = results[nA2l, "DELTA"]
+  WA2l = results[nWA2l, "DELTA"]
+  LP   = -results[nLP, "DELTA"]
+  
+  B1   = results[nB1, "DELTA"]
+  B2   = results[nB2, "DELTA"]
+  WB2  = results[nWB2, "DELTA"]
+  B2l  = results[nB2l, "DELTA"]
+  WB2l = results[nWB2l, "DELTA"]
+  LE   = -results[nLE, "DELTA"]
+  
+  #Restrictions
+  rA1       = A1 / LP #alpha_1 = 0
+  rA2       = A2 / LP #alpha_2 = 0
+  rWA2      = WA2 / A2 #phi_E = 0
+  rLP       = LP      #lambda_P = 0
+  rB1       = B1 / LE #beta_1 = 0
+  rB2       = B2 / LE #beta_2 = 0
+  rWB2      = WB2 / B2 #phi_P = 0
+  rLE       = LE      #lambda_E = 0
+  
+  #Placeholders
+  RA1          <- vector("numeric", length = nrow(results))
+  names(RA1)   <- rownames(results)
+  RA1 -> RA2 -> RWA2 -> RLP -> RB1 -> RB2 -> RWB2 -> RLE
+  
+  #alpha_1 = 0 test
+  RA1[nA1]   = 1 / LP
+  RA1[nLP]   = A1 / (LP^2)
+  RA1[nB2l]  = A1 / B2
+  RA1[nWB2l] = A1 / WB2
+  
+  #alpha_2 = 0 test
+  RA2[nA2]   = 1 / LP
+  RA2[nWA2]  = A2 / (LP*WA2)
+  RA2[nA2l]  = LE / LP
+  RA2[nWA2l] = (A2*LE) / (LP*WA2)
+  RA2[nLP]   = A2 / (LP^2)
+  RA2[nB2l]  = A2 / B2
+  RA2[nWB2l] = A2 / WB2
+  
+  #phi_E = 0 test
+  RWA2[nA2]   = WA2
+  RWA2[nWA2]  = 1 / A2
+  RWA2[nA2l]  = WA2 * LE
+  RWA2[nWA2l] = LE / A2
+  
+  #beta_1 = 0 test
+  RB1[nB1]   = 1 / LE
+  RB1[nLE]   = B1 / (LE^2)
+  RB1[nA2l]  = B1 / A2
+  RB1[nWA2l] = B1 / WA2
+  
+  #beta_2 = 0 test
+  RB2[nB2]   = 1 / LE
+  RB2[nWB2]  = B2 / (LE*WB2)
+  RB2[nB2l]  = LP / LE
+  RB2[nWB2l] = (B2*LP) / (LE*WB2)
+  RB2[nLE]   = B2 / (LE^2)
+  RB2[nA2l]  = B2 / A2
+  RB2[nWA2l] = B2 / WA2
+  
+  #phi_P = 0 test
+  RWB2[nB2]   = WB2
+  RWB2[nWB2]  = 1 / B2
+  RWB2[nB2l]  = WB2 * LP
+  RWB2[nWB2l] = LP / B2
+  
+  # WALD TESTING
+  alpha1 = delta(rA1, RA1, VAR)
+  alpha2 = delta(rA2, RA2, VAR)
+  beta1  = delta(rB1, RB1, VAR)
+  beta2  = delta(rB2, RB2, VAR)
+  
+  spemp  = delta(rWA2, RWA2, VAR)
+  sppop  = delta(rWB2, RWB2, VAR)
+  
+  # INPUT THE ACTUAL LIST OF VALUES
+  tests <- rbind(alpha1, alpha2,
+                 beta1, beta2,
+                 spemp, sppop)
+  colnames(tests) <- c("Delta", "S.E.", "P-Value")
+  rownames(tests) <- c("alpha1", "alpha2",
+                       "beat1", "beta2",
+                       "spemp", "sppop")
+  return(tests)
 }

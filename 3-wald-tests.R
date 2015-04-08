@@ -50,12 +50,15 @@ delta <- function(r, R, VAR){
   
   var  <- R %*% VAR %*% t(R)
   se   <- sqrt(var)
-  pval <- 1 - pt(se, 1)
+  pval <- 1 - pnorm(r / se)
   
-  beta <- paste0(r)
+  beta <- paste0(format(r, digits = 3))
   if (pval < 0.1) beta <- paste0(beta, "*")
   if (pval < 0.05) beta <- paste0(beta, "*")
   if (pval < 0.01) beta <- paste0(beta, "*")
+  
+  se   <- paste0(format(se, digits = 3))
+  pval <- paste0(format(pval, digits = 3))
   
   return(cbind(beta, se, pval))
 }
@@ -633,7 +636,7 @@ se2eq <- function(results, VAR){
                  spemp, sppop)
   colnames(tests) <- c("Delta", "S.E.", "P-Value")
   rownames(tests) <- c("alpha1", "alpha2",
-                       "beat1", "beta2",
+                       "beta1", "beta2",
                        "spemp", "sppop")
   return(tests)
 }

@@ -344,3 +344,47 @@ fgs3sls.2 <- function(est1, est2,       #Data
               r = rtrue
   ))
 }
+
+two.stage.simple <- function(data, n, endo, xnames, y,
+                             Ph = Ph, xW = xW, W = W){
+  require(lmtest)
+  require(sandwich)
+  require(spdep)
+  
+  if (!is.character(n)) (n <- as.character(n))
+  if (!is.character(y)) (y <- as.character(y))
+  y           <- paste0(y, n)
+  
+  work        <- data
+  names(work) <- paste0(names(data), n)
+  xnames      <- paste0(xnames, n) -> xnames1
+  
+  endo        <- paste0(endo, n)
+  M           <- regress(work[, endo], Ph)
+  ENDO        <- data.frame(Ph %*% M)
+  names(ENDO) <- paste0(endo, "h") -> endoh
+  work        <- cbind(work, ENDO)
+  
+  formula    <- reformulate(termlabels = c(endoh, xnames),
+                            response = y, intercept = F)
+  
+  reg1        <- lm(formula, work)
+  rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
+    t(t(reg1$coefficients))
+  gm            <- gmproc(rtrue,W)
+  
+  #Transform due to spatial error, not needed for instruments
+  work[, y]      <- work[, y] - gm$p * W %*% work[, y]
+  work[, xnames] <- work[, xnames] - gm$p * W %*% as.matrix(work[, xnames])
+  work[, endo]   <- work[, endo] - gm$p * W %*% as.matrix(work[, endo])
+  M2             <- regress(work[, endo], Ph) #endogenous
+  work[, endoh]  <- data.frame(Ph %*% M2)
+  reg2           <- lm(formula, work)
+  
+  rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
+    t(t(reg2$coefficients))
+  
+  work$r <- rtrue
+  
+  return(list(work = work))
+}

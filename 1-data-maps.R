@@ -16,7 +16,7 @@ if (!file.exists(localDir)) dir.create(localDir)
 keep <- data$FIPS %in% as.numeric(row.names(W))
 data <- data[keep,]
 
-data$migration <- data$Exmpt_Num.2005 + data$Exmpt_Num.2006 + 
+data$migration <- data$Exmpt_Num.2005 + data$Exmpt_Num.2006 +
   data$Exmpt_Num.2007 + data$Exmpt_Num.2008 + data$Exmpt_Num.2009 +
   data$Exmpt_Num.2010 + data$Exmpt_Num.2011
 top            <- quantile(data$migration, 0.9)
@@ -47,6 +47,14 @@ bottom     <- quantile(data$firms, 0.1)
 data$firms[data$firms > top]    <- top
 data$firms[data$firms < bottom] <- bottom
 
+data$educ  <- cut(data$EDUC, breaks = c(0, 10, 20, 30, 40, 100))
+levels(data$educ) <- c("0-10%", "10-20%", "20-30%", "30-40%", ">40%")
+
+# data$educ  <- cut(data$EDUC, breaks = c(0, 10, 15, 20, 25, 30, 100))
+# levels(data$educ) <- c("0-10%", "10-15%", "15-20%", "20-25%", "25-30%", ">30%")
+# top        <- 40
+# data$educ[data$educ > top] <- top
+
 load("0-data/Shapefiles/Lower48_2010_county.RData")
 
 usa <- merge(USA, data, by = "FIPS", all.x = T)
@@ -55,13 +63,13 @@ aea.proj = '+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-100
 #   http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html
 #   +proj=aea   +lat_1=Latitude of first standard parallel
 #               +lat_2=Latitude of second standard parallel
-#               +lat_0=Latitude of false origin 
+#               +lat_0=Latitude of false origin
 #               +lon_0=Longitude of false origin
 #               +x_0=Easting of false origin
 #               +y_0=Northing of false origin
 usa = spTransform(usa,CRS(aea.proj))
-plot(usa)
-title(main = 'Albers Equal Area')
+# plot(usa)
+# title(main = 'Albers Equal Area')
 
 # spplot(usa, zcol = "bb")
 # spplot(usa, zcol = "migration")
@@ -93,7 +101,7 @@ usa.plot <- ggplot(data = usagg.df, aes(x = long, y = lat, group = group)) +
 #         legend.direction = "horizontal")
 
 #Migration 2004 -- 2010
-mig04_10 <- usa.plot + geom_polygon(aes(fill = migration)) + 
+mig04_10 <- usa.plot + geom_polygon(aes(fill = migration)) +
   geom_path(data = stategg, colour = "black", lwd = 0.25)
 png(filename = "Figures/migration-change-04-10.png", width = 600, units = "px")
 print(mig04_10)
@@ -102,7 +110,7 @@ mig04_10 + labs(x = "",y = "", title = "Net Migration from 2004 to 2010")
 ggsave("Figures/migration-change-04-10.pdf", width = 9, height = 7.5)
 
 #Migration 2008 -- 2010
-mig08_10 <- usa.plot + geom_polygon(aes(fill = migrationchange)) + 
+mig08_10 <- usa.plot + geom_polygon(aes(fill = migrationchange)) +
   geom_path(data = stategg, colour = "black", lwd = 0.25)
 png(filename = "Figures/migration-change-08-10.png", width = 600, units = "px")
 print(mig08_10)
@@ -111,7 +119,7 @@ mig08_10 + labs(x='',y='', title="Net Migration from 2008 to 2010")
 ggsave("Figures/migration-change-08-10.pdf", width = 9, height = 7.5)
 
 #Broadband 2008 -- 2010
-bb08_10 <- usa.plot + geom_polygon(aes(fill = broadband)) + 
+bb08_10 <- usa.plot + geom_polygon(aes(fill = broadband)) +
   geom_path(data = stategg, colour = "black", lwd = 0.25)
 png(filename = "Figures/broadband-change-08-10.png", width = 600, units = "px")
 print(bb08_10)
@@ -120,7 +128,7 @@ bb08_10 + labs(x='',y='', title="Broadband Change from 2008 to 2010")
 ggsave("Figures/broadband-change-08-10.pdf", width = 9, height = 7.5)
 
 #Employment 2008 -- 2010
-job08_10 <- usa.plot + geom_polygon(aes(fill = jobs)) + 
+job08_10 <- usa.plot + geom_polygon(aes(fill = jobs)) +
   geom_path(data = stategg, colour = "black", lwd = 0.25)
 png(filename = "Figures/employment-change-08-10.png", width = 600, units = "px")
 print(job08_10)
@@ -128,7 +136,7 @@ dev.off()
 job08_10 + labs(x='',y='', title="Employment Change from 2008 to 2010")
 ggsave("Figures/employment-change-08-10.pdf", width = 9, height = 7.5)
 
-firm08_10 <- usa.plot + geom_polygon(aes(fill = firms)) + 
+firm08_10 <- usa.plot + geom_polygon(aes(fill = firms)) +
   geom_path(data = stategg, colour = "black", lwd = 0.25)
 png(filename = "Figures/establishments-change-08-10.png", width = 600,
     units = "px")
@@ -142,10 +150,10 @@ usa.plot <- ggplot(data = usagg.df, aes(x = long, y = lat, group = group)) +
   scale_fill_brewer(palette = "Greens", na.value = "blue", name = "") +
   labs(x = "",y = "") +
   guides(colour = guide_legend(override.aes = list(size = 4)))
-  
-bb08 <- usa.plot + geom_polygon(aes(fill = bb)) + 
+
+bb08 <- usa.plot + geom_polygon(aes(fill = bb)) +
   geom_path(data = stategg, colour = "black", lwd = 0.25) +
-    theme(axis.ticks = element_blank(), axis.text.y = element_blank(),
+  theme(axis.ticks = element_blank(), axis.text.y = element_blank(),
         plot.title = element_text(face="bold"), axis.text.x = element_blank(),
         panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
         panel.background = element_blank(), legend.position = c(1,0),
@@ -156,3 +164,27 @@ dev.off()
 
 bb08 + labs(x="",y="", title="Broadband Providers, 2008")
 ggsave("Figures/broadband-2008.pdf", width = 9, height = 7.5)
+
+
+#Education
+#Set the first layer for the plots:
+usa.plot <- ggplot(data = usagg.df, aes(x = long, y = lat, group = group)) +
+  scale_fill_brewer(palette = "Oranges", na.value="blue", name="") +
+  labs(x = "",y = "") +
+  guides(colour = guide_legend(override.aes = list(size = 4))) +
+  theme(axis.ticks = element_blank(), axis.text.y = element_blank(),
+        plot.title = element_text(face="bold"), axis.text.x = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank(),
+        panel.background = element_blank(), legend.position = c(1,0),
+        legend.justification = c(1,0), legend.background = element_blank())
+
+educ07   <- usa.plot + geom_polygon(aes(fill = educ)) +
+  geom_path(data = stategg, colour = "black", lwd = 0.25)
+
+png(filename = "Figures/education-07.png", width = 600,
+    units = "px")
+print(educ07)
+dev.off()
+educ07 + labs(x="",y="",
+              title="Share of Population with Bachelor's Degree (2007)")
+ggsave("Figures/education-07.pdf", width = 9, height = 7.5)

@@ -36,7 +36,7 @@ wald <- function(r, R, VAR){
   
   stat <- t(r) %*% qr.solve(R %*% VAR %*% t(R)) %*% r
   if (df == 1){
-    pval <- 1 - sqrt(pchisq(stat, df))
+    pval <- 1 - 2*sqrt(pchisq(stat, df))
   } else {
     pval <- 1 - pchisq(stat, df)
   }

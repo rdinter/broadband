@@ -19,10 +19,16 @@ data <- data[keep,]
 data$migration <- data$Exmpt_Num.2005 + data$Exmpt_Num.2006 +
   data$Exmpt_Num.2007 + data$Exmpt_Num.2008 + data$Exmpt_Num.2009 +
   data$Exmpt_Num.2010 + data$Exmpt_Num.2011
+data$migrate05_11 <- data$migration / data$POPESTIMATE2005
 top            <- quantile(data$migration, 0.9)
 bottom         <- quantile(data$migration, 0.1)
 data$migration[data$migration > top]    <- top
 data$migration[data$migration < bottom] <- bottom
+top            <- quantile(data$migrate05_11, 0.9)
+bottom         <- quantile(data$migrate05_11, 0.1)
+data$migrate05_11[data$migrate05_11 > top]    <- top
+data$migrate05_11[data$migrate05_11 < bottom] <- bottom
+
 
 data$migrationchange <- data$Exmpt_Num.2009 +  data$Exmpt_Num.2010
 top            <- quantile(data$migrationchange, 0.9)
@@ -108,6 +114,15 @@ print(mig04_10)
 dev.off()
 mig04_10 + labs(x = "",y = "", title = "Net Migration from 2004 to 2010")
 ggsave("Figures/migration-change-04-10.pdf", width = 9, height = 7.5)
+
+#Migration Rate 2004 -- 2010
+migr04_10 <- usa.plot + geom_polygon(aes(fill = migrate05_11)) +
+   geom_path(data = stategg, colour = "black", lwd = 0.25)
+png(filename = "Figures/migration-rate-04-10.png", width = 600, units = "px")
+print(migr04_10)
+dev.off()
+migr04_10 + labs(x = "",y = "", title = "Net Migration Rate from 2004 to 2010")
+ggsave("Figures/migration-rate-04-10.pdf", width = 9, height = 7.5)
 
 #Migration 2008 -- 2010
 mig08_10 <- usa.plot + geom_polygon(aes(fill = migrationchange)) +

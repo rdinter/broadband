@@ -36,7 +36,7 @@ wald <- function(r, R, VAR){
   
   stat <- t(r) %*% qr.solve(R %*% VAR %*% t(R)) %*% r
   if (df == 1){
-    pval <- 1 - 2*sqrt(pchisq(stat, df))
+    pval <- 1 - sqrt(pchisq(stat, df)) #NOTE: this is one-tailed
   } else {
     pval <- 1 - pchisq(stat, df)
   }
@@ -50,7 +50,7 @@ delta <- function(r, R, VAR){
   
   var  <- R %*% VAR %*% t(R)
   se   <- sqrt(var)
-  pval <- 2*pnorm(-abs(r / se))
+  pval <- 2*pnorm(-abs(r / se)) #NOTE: this is a two-tailed test.
   
   beta <- paste0(format(r, digits = 3))
   if (pval < 0.1)  beta <- paste0(beta, "*")

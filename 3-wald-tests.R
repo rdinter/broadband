@@ -50,15 +50,15 @@ delta <- function(r, R, VAR){
   
   var  <- R %*% VAR %*% t(R)
   se   <- sqrt(var)
-  pval <- 1 - 2*pnorm(-abs(r / se))
+  pval <- 2*pnorm(-abs(r / se))
   
   beta <- paste0(format(r, digits = 3))
   if (pval < 0.1)  beta <- paste0(beta, "*")
   if (pval < 0.05) beta <- paste0(beta, "*")
   if (pval < 0.01) beta <- paste0(beta, "*")
   
-  se   <- paste0("(", format(se, digits = 3), ")")
-  pval <- paste0(format(pval, digits = 3))
+  se   <- paste0("(", round(se, digits = 3), ")")
+  pval <- paste0(round(pval, digits = 3))
   
   return(cbind(beta, se, pval))
 }

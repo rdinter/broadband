@@ -17,5 +17,15 @@ NAICS.2010  <- names(data[NAICS.2010l])
 
 source("4-naics_2eq.R")
 
-regression <- mapply(function(x, y) naics_2eq(x, y, data = data, W = W),
+alpha      <- mapply(function(x, y) naics_2eq_alpha(x, y, data = data, W = W),
                      x = NAICS.2008, y = NAICS.2010, SIMPLIFY = F)
+
+beta       <- mapply(function(x, y) naics_2eq_beta(x, y, data = data, W = W),
+                     x = NAICS.2008, y = NAICS.2010, SIMPLIFY = F)
+
+dalpha      <- data.frame(t(sapply(alpha, c)))
+dbeta       <- data.frame(t(sapply(beta, c)))
+regressions <- cbind(dalpha, dbeta)
+
+library(xtable)
+xtable(regressions)

@@ -87,7 +87,7 @@ setvars <- function(y1.1, y1.2, y1.l, y2.1, y2.2, y3.1, y3.2 = NULL,
   est$area        <- log(data$AREA)
   est[is.na(est)] <- 0
   est$ones        <- 1
-  vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", "BLACK",
+  vars            <- c("BB", "UNrate", "MEDHOMVAL", "MEDHHINC", #"BLACK",
                        "Scale", "share", "tpi", "hwy", "EDUC", "wagesA.2008",
                        "taxwageA.2008", "permitunit", "share65", "rurala",
                        "ruraln", "poverty", "area")

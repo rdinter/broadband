@@ -28,7 +28,7 @@ sperr <- data.frame()
 
 endo1        <- c("WY2", "y2", "BB") #endogenous variables
 xnames1      <- c("y1_l", "y2_l", "Wy2_l",# "BB",
-                  "ones", "MEDHOMVAL", "BLACK",# "MEDHHINC", "UNrate", 
+                  "ones", "MEDHOMVAL", #"BLACK",# "MEDHHINC", "UNrate", 
                   "Scale", "share", "share65", "rurala",
                   "ruraln", "poverty")#, "area")#, "permitunit")
 

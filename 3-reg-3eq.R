@@ -27,7 +27,7 @@ sperr <- data.frame()
 
 endo1        <- c("WY2", "y2", "WY3", "y3") #endogenous variables
 xnames1      <- c("y1_l", "y2_l", "Wy2_l", "y3_l", "Wy3_l", "ones",
-                  "MEDHOMVAL", "BLACK", # "UNrate", "MEDHHINC",
+                  "MEDHOMVAL", #"BLACK", # "UNrate", "MEDHHINC",
                   "Scale", "share", "share65", "rurala", "ruraln")
 
 equation1 <- two.stage(data = est, n = 1, endo = endo1, xnames = xnames1,

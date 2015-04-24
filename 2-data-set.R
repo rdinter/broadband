@@ -96,8 +96,8 @@ setvars <- function(y1.1, y1.2, y1.l, y2.1, y2.2, y3.1, y3.2 = NULL,
   
   H      <- as.matrix(est[, vars[-1]])
   WH     <- W %*% H
-  WWH    <- W %*% WH
-  Ph     <- cbind(rep(1, nrow(W)), H, WH, WWH)
+  #   WWH    <- W %*% WH
+  Ph     <- cbind(rep(1, nrow(W)), H, WH)#, WWH)
   est$Ph <- Ph
   
   return(est)

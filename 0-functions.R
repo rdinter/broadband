@@ -1,5 +1,6 @@
 #Robert Dinterman, NCSU Economics PhD Student
-
+require(Matrix, quietly = T)
+require(sphet, quietly = T)
 
 #Functions
 regress <- function(y,x){
@@ -105,23 +106,41 @@ gmproc <- function(r,W, p = 0.7){
 
 specify_decimal <- function(x, k) format(round(x, k), nsmall=k)
 
-# In 3 Equation -----------------------------------------------------------
-
 ols.results <- function(model) {
-  require(sandwich)
+  require(sandwich, quietly = T)
   DELTA <- model$coefficients
   SE   <- sqrt(diag(vcovHC(model)))
   
   cbind(DELTA, SE)
 }
 
+#gg_het from sphet
+#psirhorho_het
+
+# stage.results <- function(model, Ph, gm, W) {
+#   e  = model$residuals
+#   df = nrow(model$model) - ncol(model$model)
+#   s2 = crossprod(e) / df
+#   omega = as.numeric(e^2)
+#   
+#   Zp <- Hmat %*% bz
+#   ZpZp <- crossprod(Zp)
+#   ZpZpi <- solve(ZpZp)
+#   
+#   step1 <- sphet:::gg_het(W, model$residuals, nrow(W))
+#   #Hmat is the Ph
+#   rhost <- sphet:::psirhorho_het(rho, residuals, Hmat = Ph,
+#                                  Zmat, Ws, step1.c)
+#   #http://econweb.umd.edu/~prucha/STATPROG/OLS/desols.pdf
+#   R = diag(nrow(W)) - gm$p*W #LEFT OFF
+# }
 
 # Estimation --------------------------------------------------------------
 
 two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
-  require(lmtest)
-  require(sandwich)
-  require(spdep)
+  require(lmtest, quietly = T)
+  require(sandwich, quietly = T)
+  require(spdep, quietly = T)
   
   if (!is.character(n)) (n <- as.character(n))
   if (!is.character(y)) (y <- as.character(y))
@@ -151,7 +170,7 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   gmerror <- GMerrorsar(formula, work, xW, returnHcov = T)
   
   rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
-            t(t(reg1$coefficients))
+    t(t(reg1$coefficients))
   
   #Check for residual autocorrelation
   m1eq <-moran.test(rtrue, xW, randomisation = F, alternative = "two.sided")
@@ -174,7 +193,7 @@ two.stage <- function(data, n, endo, xnames, y, Ph = Ph, xW = xW, W = W){
   print(lm.LMtests(reg2, xW, test = "all"))
   
   rtrue <- work[, y] - t(t(work[, c(endo, xnames)])) %*%
-            t(t(reg2$coefficients))
+    t(t(reg2$coefficients))
   m2eq  <- moran.test(rtrue, xW, randomisation = F, alternative = "two.sided")
   print("Residual Autocorrelation #2")
   print(m2eq)
@@ -254,7 +273,7 @@ fgs3sls.3 <- function(est1, est2, est3,   #Data
   
   bread  <- tryCatch(qr.solve(t(ZH) %*% ADJ %*% ZH),
                      error = function(e){
-                       require(MASS)
+                       require(MASS, quietly = T)
                        ginv(t(ZH) %*% ADJ %*% ZH)
                      })
   
@@ -283,7 +302,7 @@ fgs3sls.2 <- function(est1, est2,       #Data
   # FGS3SLS -----------------------------------------------------------------
   endo1  <- paste0(endo1, "1")
   endo2  <- paste0(endo2, "2")
-    
+  
   xnames1<- paste0(xnames1, "1")
   xnames2<- paste0(xnames2, "2")
   
@@ -324,7 +343,7 @@ fgs3sls.2 <- function(est1, est2,       #Data
   
   bread  <- tryCatch(qr.solve(t(ZH) %*% ADJ %*% ZH),
                      error = function(e){
-                       require(MASS)
+                       require(MASS, quietly = T)
                        ginv(t(ZH) %*% ADJ %*% ZH)
                      })
   
@@ -347,9 +366,9 @@ fgs3sls.2 <- function(est1, est2,       #Data
 
 two.stage.simple <- function(data, n, endo, xnames, y,
                              Ph = Ph, xW = xW, W = W){
-  require(lmtest)
-  require(sandwich)
-  require(spdep)
+  require(lmtest, quietly = T)
+  require(sandwich, quietly = T)
+  require(spdep, quietly = T)
   
   if (!is.character(n)) (n <- as.character(n))
   if (!is.character(y)) (y <- as.character(y))

@@ -65,3 +65,28 @@ tab2 <- cbind(sapply(data[,vars08], mean), sapply(data[,vars08], sd),
               sapply(data[,vars10]- data[,vars08], mean),
               sapply(data[,vars10]- data[,vars08], sd))
 xtable(tab2)
+mean(data$Exmpt_Num.2009 + data$Exmpt_Num.2010)
+sd(data$Exmpt_Num.2009 + data$Exmpt_Num.2010)
+
+# Spatial -----------------------------------------------------------------
+
+data$WBB2008 = W %*% data$total_prov.2008B
+data$WBB2010 = W %*% data$total_prov.2010B
+data$WEMP2008 = W %*% data$employA.2008
+data$WEMP2010 = W %*% data$employA.2010
+data$WEST2008 = W %*% data$establishmentsA.2008
+data$WEST2010 = W %*% data$establishmentsA.2010
+data$WPOP2008 = W %*% data$POPESTIMATE2008
+data$WPOP2010 = W %*% data$POPESTIMATE2010
+data$WMIG = W %*% (data$Exmpt_Num.2009 + data$Exmpt_Num.2010)
+
+new08 <- c("WBB2008", "WEMP2008", "WEST2008", "WPOP2008")
+new10 <- c("WBB2010", "WEMP2010", "WEST2010", "WPOP2010")
+
+tab3 <- cbind(sapply(data[,new08], mean), sapply(data[,new08], sd), 
+              sapply(data[,new10], mean), sapply(data[,new10], sd),
+              sapply(data[,new10]- data[,new08], mean),
+              sapply(data[,new10]- data[,new08], sd))
+xtable(tab3)
+mean(data$WMIG)
+sd(data$WMIG)

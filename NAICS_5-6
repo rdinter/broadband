@@ -1,0 +1,120 @@
+> #Robert Dinterman, NCSU Economics PhD Student
+>
+>
+> # Load Data ---------------------------------------------------------------
+>
+> load("1-data.RData")
+>
+> keep <- data$FIPS %in% as.numeric(row.names(W))
+> data <- data[keep,]
+>
+> # Employees ---------------------------------------------------------------
+>
+> NAICS.2008l <- grepl("employA", names(data)) & grepl("2008", names(data))
+> NAICS.2008  <- names(data[NAICS.2008l])
+>
+> NAICS.2010l <- grepl("employA", names(data)) & grepl("2010", names(data))
+> NAICS.2010  <- names(data[NAICS.2010l])
+>
+> source("4-naics_2eq.R")
+>
+> alpha1      <- mapply(function(x, y) naics_2eq_alpha_new(x, y, data = data, W = W),
++                       x = NAICS.2008, y = NAICS.2010, SIMPLIFY = F)
+>
+> beta1       <- mapply(function(x, y) naics_2eq_beta_new(x, y, data = data, W = W),
++                       x = NAICS.2008, y = NAICS.2010, SIMPLIFY = F)
+>
+> dalpha1      <- data.frame(t(sapply(alpha1, c)))
+> dbeta1       <- data.frame(t(sapply(beta1, c)))
+>
+> # Establishments ----------------------------------------------------------
+>
+> NAICS.2008l <- grepl("establishmentsA", names(data)) & grepl("2008", names(data))
+> NAICS.2008  <- names(data[NAICS.2008l])
+>
+> NAICS.2010l <- grepl("establishmentsA", names(data)) & grepl("2010", names(data))
+> NAICS.2010  <- names(data[NAICS.2010l])
+>
+> alpha2      <- mapply(function(x, y) naics_2eq_alpha_new(x, y, data = data, W = W),
++                       x = NAICS.2008, y = NAICS.2010, SIMPLIFY = F)
+>
+> beta2       <- mapply(function(x, y) naics_2eq_beta_new(x, y, data = data, W = W),
++                       x = NAICS.2008, y = NAICS.2010, SIMPLIFY = F)
+>
+> dalpha2      <- data.frame(t(sapply(alpha2, c)))
+> dbeta2       <- data.frame(t(sapply(beta2, c)))
+>
+>
+> # Tables ------------------------------------------------------------------
+>
+> alpha <- cbind(dalpha1, dalpha2)
+> beta  <- cbind(dbeta1, dbeta2)
+>
+> library(xtable)
+> xtable(alpha)
+% latex table generated in R 3.2.0 by xtable 1.7-4 package
+% Wed May  6 10:18:12 2015
+\begin{table}[ht]
+\centering
+\begin{tabular}{rllllll}
+  \hline
+ & Delta & S.E. & P.Value & Delta & S.E. & P.Value \\
+  \hline
+employA.2008 & 3.19 & (16.439) & 0.846 & 0.649 & (1.666) & 0.697 \\
+  employA.10.2008 & 0.855 & (1.346) & 0.525 & 1.42 & (4.061) & 0.727 \\
+  employA.11.2008 & 0.608 & (0.946) & 0.52 & 0.791 & (1.864) & 0.672 \\
+  employA.21.2008 & 0.661 & (0.734) & 0.368 & 0.472 & (1.276) & 0.711 \\
+  employA.22.2008 & 0.162 & (0.684) & 0.813 & 0.0663 & (0.209) & 0.751 \\
+  employA.23.2008 & 0.438 & (0.914) & 0.632 & -2.19 & (7.208) & 0.761 \\
+  employA.31.33.2008 & 6.48 & (31.14) & 0.835 & -0.0357 & (1.699) & 0.983 \\
+  employA.42.2008 & 0.22 & (2.225) & 0.921 & 0.755 & (1.041) & 0.468 \\
+  employA.44.45.2008 & -0.0979 & (0.246) & 0.691 & -0.671 & (6.381) & 0.916 \\
+  employA.48.49.2008 & 0.689 & (2.322) & 0.767 & 0.142 & (0.432) & 0.742 \\
+  employA.51.2008 & -0.62 & (1.278) & 0.627 & 2 & (3.951) & 0.613 \\
+  employA.52.2008 & -0.051 & (1.014) & 0.96 & 2.16 & (52.263) & 0.967 \\
+  employA.53.2008 & 0.285 & (1.11) & 0.797 & 0.591 & (2.609) & 0.821 \\
+  employA.54.2008 & 0.497 & (0.967) & 0.607 & -0.00825 & (1.576) & 0.996 \\
+  employA.55.2008 & 0.47 & (0.641) & 0.464 & 0.0199 & (0.156) & 0.899 \\
+  employA.56.2008 & 0.0317 & (0.161) & 0.844 & 0.462 & (2.065) & 0.823 \\
+  employA.61.2008 & 0.362 & (1.899) & 0.849 & -0.832 & (4.141) & 0.841 \\
+  employA.62.2008 & 0.29 & (0.566) & 0.608 & -0.218 & (5.704) & 0.97 \\
+  employA.71.2008 & 0.147 & (1.784) & 0.934 & -101 & (31270.207) & 0.997 \\
+  employA.72.2008 & 0.415 & (0.445) & 0.35 & -2.15 & (12.73) & 0.866 \\
+  employA.81.2008 & -0.474 & (7.066) & 0.946 & 0.367 & (0.666) & 0.582 \\
+   \hline
+\end{tabular}
+\end{table}
+> xtable(beta)
+% latex table generated in R 3.2.0 by xtable 1.7-4 package
+% Wed May  6 10:18:12 2015
+\begin{table}[ht]
+\centering
+\begin{tabular}{rllllll}
+  \hline
+ & Delta & S.E. & P.Value & Delta & S.E. & P.Value \\
+  \hline
+employA.2008 & 0.0868 & (0.133) & 0.515 & 0.459 & (1.266) & 0.717 \\
+  employA.10.2008 & 0.179 & (1.177) & 0.879 & 0.292 & (0.842) & 0.729 \\
+  employA.11.2008 & 1.49 & (2.828) & 0.6 & 0.63 & (18.703) & 0.973 \\
+  employA.21.2008 & 0.29 & (1.673) & 0.862 & -0.435 & (2.093) & 0.835 \\
+  employA.22.2008 & -0.189 & (0.88) & 0.83 & -0.0716 & (0.42) & 0.865 \\
+  employA.23.2008 & 0.272 & (0.655) & 0.678 & 0.149 & (0.263) & 0.572 \\
+  employA.31.33.2008 & -0.113 & (0.313) & 0.718 & 0.0116 & (0.12) & 0.924 \\
+  employA.42.2008 & -0.0667 & (0.245) & 0.785 & -0.683 & (0.852) & 0.423 \\
+  employA.44.45.2008 & 0.0296 & (0.126) & 0.814 & 0.505 & (0.769) & 0.511 \\
+  employA.48.49.2008 & -0.28 & (7.322) & 0.97 & -0.984 & (5.629) & 0.861 \\
+  employA.51.2008 & -0.309 & (1.579) & 0.845 & -0.0945 & (0.49) & 0.847 \\
+  employA.52.2008 & 0.0219 & (0.148) & 0.882 & -0.0351 & (0.276) & 0.899 \\
+  employA.53.2008 & 0.402 & (0.59) & 0.496 & 0.494 & (0.911) & 0.587 \\
+  employA.54.2008 & 0.12 & (0.257) & 0.64 & 0.0237 & (0.62) & 0.969 \\
+  employA.55.2008 & -0.582 & (1.179) & 0.622 & -0.00618 & (0.083) & 0.941 \\
+  employA.56.2008 & 0.0167 & (0.068) & 0.806 & -4.48 & (48.148) & 0.926 \\
+  employA.61.2008 & 0.492 & (6.674) & 0.941 & 0.0989 & (0.141) & 0.482 \\
+  employA.62.2008 & 0.281 & (0.632) & 0.657 & 0.0454 & (2.865) & 0.987 \\
+  employA.71.2008 & 0.195 & (4.297) & 0.964 & 0.408 & (1.131) & 0.718 \\
+  employA.72.2008 & -0.154 & (0.908) & 0.865 & 0.3 & (0.708) & 0.672 \\
+  employA.81.2008 & -12.2 & (450.58) & 0.978 & 0.227 & (0.171) & 0.184 \\
+   \hline
+\end{tabular}
+\end{table}
+>
